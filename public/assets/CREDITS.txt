@@ -1,0 +1,21 @@
+Image Credits (temporary – replace with client-owned assets if needed)
+
+Hero background:
+- "City skyline with skyscrapers at sunset" by Nejc Soklič (Unsplash)
+  https://unsplash.com/photos/city-skyline-with-skyscrapers-at-sunset-s8_cIpx7uRE
+
+About section media:
+- "Canary Wharf Skyline" (Wikimedia Commons) — PD-self
+  https://commons.wikimedia.org/wiki/File:Canary_Wharf_Skyline.jpg
+
+World map (Contact section):
+- "World-map-with-dots.gif" by Marcovandaal (Wikimedia Commons) — CC0 1.0
+  https://commons.wikimedia.org/wiki/File:World-map-with-dots.gif
+
+Team photos:
+- Generated placeholder images (no real persons) for demo.
+
+License notes:
+- Unsplash images: Unsplash License (free to use).
+- Wikimedia Commons PD-self image: free to use; keep source credit in this file.
+- World map: CC0 (public domain dedication).

@@ -1,0 +1,268 @@
+/* app/privacypolicy/privacypolicy.css
+   ------------------------------------------------------------------
+   Self-contained styles for the Privacy Policy page.
+   Everything is namespaced under .pp so it won't touch the rest of
+   your site.
+
+   To match your brand: change --pp-accent (and optionally
+   --pp-hero-bg) below — the whole page re-themes from these.
+   ------------------------------------------------------------------ */
+
+.pp {
+  --pp-accent: #1d4ed8;          /* primary accent — set to your brand color */
+  --pp-accent-ink: #16348f;      /* darker accent for hovers */
+  --pp-gold: #c8a45c;            /* thin premium hairline */
+  --pp-hero-bg: #0e1320;         /* hero background */
+  --pp-hero-ink: #f4f6fb;        /* hero text */
+
+  --pp-bg: #fbfbfc;
+  --pp-surface: #ffffff;
+  --pp-ink: #14181f;
+  --pp-body: #3a4150;
+  --pp-muted: #717b8c;
+  --pp-line: #e9ecf2;
+  --pp-soft: #f3f6fc;
+
+  --pp-radius: 16px;
+  --pp-measure: 70ch;
+
+  background: var(--pp-bg);
+  color: var(--pp-ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---------------- Hero ---------------- */
+.pp-hero {
+  position: relative;
+  background: var(--pp-hero-bg);
+  color: var(--pp-hero-ink);
+  overflow: hidden;
+}
+.pp-hero::before {
+  /* subtle radial glow */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 120% at 20% -10%, rgba(29, 78, 216, 0.28), transparent 60%),
+    radial-gradient(50% 120% at 100% 0%, rgba(200, 164, 92, 0.12), transparent 55%);
+  pointer-events: none;
+}
+.pp-hero::after {
+  /* gold hairline at the bottom */
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--pp-gold), transparent);
+  opacity: 0.7;
+}
+.pp-hero-inner {
+  position: relative;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 96px 24px 84px;
+  text-align: center;
+}
+.pp-eyebrow {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--pp-gold);
+  margin-bottom: 18px;
+}
+.pp-title {
+  margin: 0;
+  font-size: clamp(2.25rem, 5.5vw, 3.4rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+}
+.pp-lede {
+  max-width: 56ch;
+  margin: 22px auto 0;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: rgba(244, 246, 251, 0.78);
+}
+.pp-effective {
+  display: inline-block;
+  margin-top: 28px;
+  padding: 7px 18px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--pp-hero-ink);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  backdrop-filter: blur(4px);
+}
+
+/* ---------------- Body ---------------- */
+.pp-wrap {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 64px 24px 96px;
+}
+.pp-intro {
+  font-size: 1.12rem;
+  line-height: 1.8;
+  color: var(--pp-body);
+  margin: 0;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--pp-line);
+}
+
+/* ---------------- Sections ---------------- */
+.pp-section {
+  padding: 40px 0;
+  border-bottom: 1px solid var(--pp-line);
+  scroll-margin-top: 96px;
+}
+.pp-section:last-child {
+  border-bottom: 0;
+  padding-bottom: 8px;
+}
+.pp-h2 {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 18px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--pp-ink);
+}
+.pp-num {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--pp-accent);
+  background: var(--pp-soft);
+  border: 1px solid var(--pp-line);
+  border-radius: 11px;
+}
+.pp-section-body {
+  max-width: var(--pp-measure);
+}
+.pp-section-body p {
+  margin: 0 0 14px;
+  color: var(--pp-body);
+}
+.pp-section-body p:last-child {
+  margin-bottom: 0;
+}
+.pp-subhead {
+  font-weight: 600;
+  color: var(--pp-ink) !important;
+  margin: 22px 0 10px !important;
+  font-size: 1.02rem;
+}
+
+/* ---------------- Lists ---------------- */
+.pp-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px;
+}
+.pp-list li {
+  position: relative;
+  padding-left: 28px;
+  margin: 10px 0;
+  color: var(--pp-body);
+}
+.pp-list li::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 0.72em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--pp-accent);
+}
+
+/* ---------------- Contact card ---------------- */
+.pp-contact {
+  margin-top: 8px;
+  padding: 26px 28px;
+  background: var(--pp-surface);
+  border: 1px solid var(--pp-line);
+  border-left: 3px solid var(--pp-accent);
+  border-radius: var(--pp-radius);
+  box-shadow: 0 1px 2px rgba(20, 24, 31, 0.04),
+    0 12px 28px -18px rgba(20, 24, 31, 0.18);
+}
+.pp-contact-name {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--pp-ink) !important;
+  margin: 0 0 14px !important;
+}
+.pp-contact-row {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin: 8px 0 !important;
+}
+.pp-contact-row span {
+  flex: 0 0 70px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pp-muted);
+}
+.pp-contact-row a {
+  color: var(--pp-accent);
+  text-decoration: none;
+  font-weight: 500;
+  word-break: break-word;
+}
+.pp-contact-row a:hover {
+  color: var(--pp-accent-ink);
+  text-decoration: underline;
+}
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 640px) {
+  .pp-hero-inner {
+    padding: 72px 20px 60px;
+  }
+  .pp-wrap {
+    padding: 44px 20px 72px;
+  }
+  .pp-h2 {
+    font-size: 1.22rem;
+    gap: 12px;
+  }
+  .pp-num {
+    width: 36px;
+    height: 36px;
+  }
+  .pp-contact {
+    padding: 20px 20px;
+  }
+  .pp-contact-row {
+    flex-direction: column;
+    gap: 2px;
+  }
+  .pp-contact-row span {
+    flex: none;
+  }
+}
