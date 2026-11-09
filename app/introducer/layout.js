@@ -65,9 +65,6 @@ export default function IntermediaryLayout({ children }) {
 
       {children}
 
-      <footer className="itp-foot">
-        © {new Date().getFullYear()} IdeaTown Investments · Mediator Network
-      </footer>
     </div>
   );
 }

@@ -1,10 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
   const toggleDrawer = () => {
@@ -18,11 +20,30 @@ export default function Header() {
     document.body.style.overflow = "";
   };
 
-  const isActive = (path) => pathname === path;
+  // sub-pages (e.g. /introducer/application) keep their section highlighted
+  const isActive = (path) =>
+    path === "/" ? pathname === "/" : pathname === path || pathname?.startsWith(`${path}/`);
 
   useEffect(() => {
     closeDrawer();
   }, [pathname]);
+
+  // shadow once the page moves. The bar keeps its height: resizing a
+  // sticky header shifts the page and makes it flicker at the threshold.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Escape closes the drawer
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => e.key === "Escape" && closeDrawer();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
   const navLinks = [
     { label: "Home", href: "/" },
@@ -48,19 +69,23 @@ export default function Header() {
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  max-width: 200px !important;
+  max-width: 240px !important;
   overflow: hidden !important;
 }
 /* extra-specific selector so it beats any global img/logo rule */
 .header .brand .brand-logo {
-  height: clamp(30px, 3vw, 40px) !important;
+  height: clamp(44px, 4.2vw, 56px) !important;
   width: auto !important;
-  max-height: 40px !important;
-  max-width: 180px !important;
+  max-height: 56px !important;
+  max-width: 220px !important;
   object-fit: contain !important;
   display: block;
 }
         /* ── Header layout ── */
+        /* always the site font, even inside pages that set their own (e.g. /introducer) */
+        .header, .h-panel {
+          font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+        }
         .header {
           width: 100% !important;
           box-sizing: border-box !important;
@@ -69,8 +94,22 @@ export default function Header() {
           z-index: 100;
           background: rgba(253,250,245,.94);
           border-bottom: 1px solid rgba(198,161,91,.14);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
+          backdrop-filter: blur(16px) saturate(140%);
+          -webkit-backdrop-filter: blur(16px) saturate(140%);
+          transition: box-shadow .25s, background .25s;
+        }
+        /* thin gold hairline along the top edge */
+        .header::before {
+          content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px;
+          background: linear-gradient(90deg, transparent, #C6A15B 30%, #E8C876 50%, #C6A15B 70%, transparent);
+          opacity: .75; pointer-events: none;
+        }
+        .header.is-scrolled {
+          background: rgba(253,250,245,.97);
+          box-shadow: 0 10px 30px rgba(14,16,22,.07);
+        }
+        .header :focus-visible, .h-panel :focus-visible {
+          outline: 2px solid #C6A15B; outline-offset: 3px; border-radius: 8px;
         }
         .header .container {
           padding-left: clamp(20px, 4vw, 72px) !important;
@@ -105,23 +144,29 @@ export default function Header() {
           text-transform: uppercase;
           color: rgba(15,20,26,.55) !important;
           text-decoration: none;
-          padding: clamp(6px, 0.55vw, 10px) clamp(9px, 1vw, 20px);
+          padding: clamp(8px, 0.6vw, 11px) clamp(9px, 1vw, 20px);
           border-radius: 8px;
-          transition: color .18s, background .18s !important;
+          transition: color .18s !important;
           white-space: nowrap;
           flex-shrink: 0;
+          position: relative;
         }
-        .h-nav a:hover {
-          color: rgba(15,20,26,.90) !important;
-          background: rgba(15,20,26,.05) !important;
-        }
+        .h-nav a:hover { color: rgba(15,20,26,.92) !important; }
         .h-nav a.nav-active {
-          color: rgba(15,20,26,.92) !important;
+          color: #0e1016 !important;
           font-weight: 700 !important;
-          background: rgba(198,161,91,.10) !important;
         }
-        /* Remove underline - no ::after pseudo element */
-        .h-nav a::after { display: none !important; }
+        /* gold bar under the link — grows on hover, stays on the active page */
+        .h-nav a::after {
+          content: '' !important; display: block !important;
+          position: absolute; left: 50%; bottom: 1px;
+          width: 18px; height: 2px; border-radius: 2px;
+          background: linear-gradient(90deg, #C6A15B, #E8C876);
+          transform: translateX(-50%) scaleX(0); transform-origin: center;
+          transition: transform .25s cubic-bezier(.22,.68,0,1.1);
+        }
+        .h-nav a:hover::after { transform: translateX(-50%) scaleX(.6); }
+        .h-nav a.nav-active::after { transform: translateX(-50%) scaleX(1); }
 
         /* ── CTA area ── */
         .h-cta {
@@ -166,9 +211,10 @@ export default function Header() {
           align-items: center;
           gap: 6px;
           padding: clamp(7px, 0.5vw, 9px) clamp(12px, 0.9vw, 18px);
-          border-radius: 7px;
-          background: linear-gradient(135deg, #C6A15B, #8A6330);
-          color: #fff !important;
+          border-radius: 999px;
+          background: transparent;
+          border: 1.5px solid rgba(198,161,91,.55);
+          color: #8a6330 !important;
           font-size: clamp(9px, 0.6vw, 11px);
           font-weight: 700;
           letter-spacing: .08em;
@@ -176,37 +222,45 @@ export default function Header() {
           text-decoration: none;
           white-space: nowrap;
           flex-shrink: 0;
-          box-shadow: 0 3px 12px rgba(198,161,91,.24);
-          transition: transform .18s, box-shadow .18s;
+          transition: background .18s, border-color .18s, transform .18s;
         }
         .h-introducer-btn:hover {
+          background: rgba(198,161,91,.10);
+          border-color: #C6A15B;
           transform: translateY(-1px);
-          box-shadow: 0 6px 18px rgba(198,161,91,.34);
         }
 
         /* ── Pitch button ── */
         .h-pitch-btn {
           display: inline-flex;
           align-items: center;
-          gap: 6px;
+          gap: 8px;
           padding: clamp(7px, 0.5vw, 9px) clamp(12px, 0.9vw, 18px);
-          border-radius: 7px;
-          background: linear-gradient(135deg, #C6A15B, #8A6330);
+          border-radius: 999px;
+          /* paint the gradient under the border too, so the ends don't
+             show a repeated darker sliver */
+          border: 1.5px solid transparent;
+          background: linear-gradient(180deg, #CBA661 0%, #A57D3C 100%) border-box;
           color: #fff !important;
           font-size: clamp(9px, 0.6vw, 11px);
           font-weight: 700;
           letter-spacing: .08em;
           text-transform: uppercase;
           text-decoration: none;
+          text-shadow: 0 1px 1px rgba(90,62,22,.25);
           white-space: nowrap;
           flex-shrink: 0;
-          box-shadow: 0 3px 12px rgba(198,161,91,.24);
-          transition: transform .18s, box-shadow .18s;
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.30), 0 4px 14px rgba(138,99,48,.22);
+          transition: transform .18s, box-shadow .18s, filter .18s;
         }
         .h-pitch-btn:hover {
           transform: translateY(-1px);
-          box-shadow: 0 6px 18px rgba(198,161,91,.34);
+          filter: brightness(1.04);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.30), 0 8px 20px rgba(138,99,48,.28);
         }
+        .h-pitch-btn:active { transform: translateY(0); }
+        .h-pitch-arrow { display: block; flex-shrink: 0; transition: transform .2s; }
+        .h-pitch-btn:hover .h-pitch-arrow { transform: translateX(3px); }
 
         /* ── Explicit large-screen boosts ── */
         @media (min-width: 1440px) {
@@ -223,14 +277,14 @@ export default function Header() {
           .h-introducer-btn { font-size: 11.5px; padding: 10px 20px; }
           .h-pitch-btn      { font-size: 11.5px; padding: 10px 20px; }
           .header-inner     { height: 92px; }
-          .header .brand .brand-logo { height: 48px !important; max-height: 48px !important; }
+          .header .brand .brand-logo { height: 62px !important; max-height: 62px !important; }
         }
         @media (min-width: 2200px) {
           .h-nav a          { font-size: 14px !important; padding: 11px 26px; }
           .h-introducer-btn { font-size: 12px; padding: 11px 24px; }
           .h-pitch-btn      { font-size: 12px; padding: 11px 24px; }
           .header-inner     { height: 100px; }
-          .header .brand .brand-logo { height: 54px !important; max-height: 54px !important; }
+          .header .brand .brand-logo { height: 68px !important; max-height: 68px !important; }
         }
 
         /* Hide the outline badge a little earlier so the two gold
@@ -244,9 +298,9 @@ export default function Header() {
           display: none;
           align-items: center;
           justify-content: center;
-          width: 42px;
-          height: 42px;
-          border-radius: 10px;
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
           border: 1.5px solid rgba(15,20,26,.12);
           background: transparent;
           cursor: pointer;
@@ -296,11 +350,11 @@ export default function Header() {
         }
         .h-panel-head img { height: 52px; width: auto; display: block; }
         .h-panel-close {
-          width: 38px; height: 38px; border-radius: 10px;
+          width: 44px; height: 44px; border-radius: 12px;
           border: 1.5px solid rgba(14,16,22,.10);
           background: transparent; cursor: pointer;
           display: flex; align-items: center; justify-content: center;
-          font-size: 15px; color: rgba(14,16,22,.46);
+          color: rgba(14,16,22,.55);
           transition: border-color .18s, background .18s, color .18s;
           padding: 0;
         }
@@ -335,9 +389,20 @@ export default function Header() {
           background: rgba(198,161,91,.08);
           border-left-color: #C6A15B;
         }
-        .h-link-dot {
-          width:6px; height:6px; border-radius:50%;
-          background:#C6A15B; flex-shrink:0;
+        .h-link-l { display: inline-flex; align-items: baseline; gap: 14px; }
+        .h-link-n {
+          font-size: 10px; font-weight: 700; letter-spacing: .08em;
+          color: rgba(154,110,40,.65); font-variant-numeric: tabular-nums;
+        }
+        .h-link-chev {
+          width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+          display: flex; align-items: center; justify-content: center;
+          border: 1px solid rgba(14,16,22,.10); color: rgba(14,16,22,.45);
+          transition: border-color .18s, background .18s, color .18s, transform .18s;
+        }
+        .h-panel-links a:hover .h-link-chev { transform: translateX(2px); }
+        .h-panel-links a.active .h-link-chev {
+          border-color: #C6A15B; background: #C6A15B; color: #fff;
         }
         .h-panel-links a:nth-child(1){animation:hLinkIn .30s ease .06s both}
         .h-panel-links a:nth-child(2){animation:hLinkIn .30s ease .11s both}
@@ -363,14 +428,14 @@ export default function Header() {
           gap: 8px;
           padding: 15px 22px;
           border-radius: 10px;
-          background: linear-gradient(135deg,#C6A15B,#8A6330);
+          background: linear-gradient(180deg, #CBA661 0%, #A57D3C 100%);
           color: #fff !important;
           font-size: 11px;
           font-weight: 700;
           letter-spacing: .14em;
           text-transform: uppercase;
           text-decoration: none;
-          box-shadow: 0 6px 22px rgba(198,161,91,.30);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.30), 0 6px 20px rgba(138,99,48,.22);
           transition: opacity .18s, transform .14s;
         }
         .h-panel-cta:hover { opacity:.92; transform:translateY(-1px); }
@@ -414,8 +479,8 @@ export default function Header() {
           .h-hamburger    { display: flex !important; }
         }
         @media (max-width: 480px) {
-          .header .brand .brand-logo { height: 36px !important; max-height: 36px !important; }
-          .header-inner { height: 60px; }
+          .header .brand .brand-logo { height: 44px !important; max-height: 44px !important; }
+          .header-inner { height: 64px; }
         }
 
       `,
@@ -423,28 +488,29 @@ export default function Header() {
       />
 
       {/* ═══════ HEADER BAR ═══════ */}
-      <header className="header">
+      <header className={`header${scrolled ? " is-scrolled" : ""}`}>
         <div className="container">
           <div className="header-inner">
             {/* LOGO */}
-            <a href="/" className="brand" aria-label="Idea Town Investments">
+            <Link href="/" className="brand" aria-label="Idea Town Investments — home">
               <img
                 src="/assets/logo.svg"
                 alt="Idea Town Investments"
                 className="brand-logo"
               />
-            </a>
+            </Link>
 
             {/* DESKTOP NAV */}
             <nav className="h-nav" aria-label="Primary navigation">
               {navLinks.map(({ label, href }) => (
-                <a
+                <Link
                   key={href}
                   href={href}
                   className={isActive(href) ? "nav-active" : ""}
+                  aria-current={isActive(href) ? "page" : undefined}
                 >
                   {label}
-                </a>
+                </Link>
               ))}
             </nav>
 
@@ -454,19 +520,24 @@ export default function Header() {
                 <span className="h-badge-dot" />
                 <span className="h-badge-txt">Dubai, UAE</span>
               </div> */}
-              <a href="/mediator" className="h-introducer-btn">
+              <Link href="/introducer" className="h-introducer-btn">
                 Join as Introducer
-              </a>
-              <a href="/contact#pitch-form" className="h-pitch-btn">
-                Pitch Portal <span>→</span>
-              </a>
+              </Link>
+              <Link href="/contact#pitch-form" className="h-pitch-btn">
+                Pitch Portal
+                <svg className="h-pitch-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </Link>
               {/* HAMBURGER — mobile only */}
               <button
                 className="h-hamburger"
                 aria-label="Open menu"
+                aria-expanded={open}
+                aria-controls="h-drawer"
                 onClick={toggleDrawer}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path
                     d="M4 7h16M4 12h16M4 17h10"
                     stroke="currentColor"
@@ -484,47 +555,58 @@ export default function Header() {
       {open && (
         <>
           <div className="h-back" onClick={closeDrawer} />
-          <div className="h-panel">
+          <div className="h-panel" id="h-drawer" role="dialog" aria-modal="true" aria-label="Site menu">
             <div className="h-panel-head">
-              <a href="/" onClick={closeDrawer}>
+              <Link href="/" onClick={closeDrawer}>
                 <img src="/assets/logo.svg" alt="Idea Town Investments" />
-              </a>
+              </Link>
               <button
                 className="h-panel-close"
                 onClick={closeDrawer}
                 aria-label="Close menu"
+                autoFocus
               >
-                ✕
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6 6 18" />
+                </svg>
               </button>
             </div>
             <div className="h-panel-links">
-              {navLinks.map(({ label, href }) => (
-                <a
+              {navLinks.map(({ label, href }, i) => (
+                <Link
                   key={href}
                   href={href}
                   onClick={closeDrawer}
                   className={isActive(href) ? "active" : ""}
+                  aria-current={isActive(href) ? "page" : undefined}
                 >
-                  <span>{label}</span>
-                  {isActive(href) && <span className="h-link-dot" />}
-                </a>
+                  <span className="h-link-l">
+                    <span className="h-link-n">{String(i + 1).padStart(2, "0")}</span>
+                    {label}
+                  </span>
+                  <span className="h-link-chev" aria-hidden="true">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="m9 6 6 6-6 6" />
+                    </svg>
+                  </span>
+                </Link>
               ))}
             </div>
             <div className="h-panel-footer">
-              <a
-                href="/mediator"
+              <Link
+                href="/contact#pitch-form"
                 onClick={closeDrawer}
                 className="h-panel-cta"
               >
-                Join as Introducer
-              </a>
-              <a
-                href="/contact#pitch-form"
+                Submit a Pitch →
+              </Link>
+              <Link
+                href="/introducer"
                 onClick={closeDrawer}
                 className="h-panel-cta h-panel-cta--outline"
               >
-                Submit a Pitch →
-              </a>
+                Join as Introducer
+              </Link>
               <div className="h-panel-status">
                 <div className="h-panel-status-dot" />
                 <span className="h-panel-status-txt">

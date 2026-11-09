@@ -5,6 +5,14 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
+// the landing page uses the full site footer; the form keeps this slim one
 export default function Layout({ children }) {
-  return children;
+  return (
+    <>
+      {children}
+      <footer className="itp-foot">
+        © {new Date().getFullYear()} IdeaTown Investments · Introducer Network
+      </footer>
+    </>
+  );
 }

@@ -35,25 +35,102 @@ const cards = [
   },
 ];
 
+const ICON_PROPS = {
+  viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
+  strokeWidth: 1.6, strokeLinecap: "round", strokeLinejoin: "round",
+  "aria-hidden": true,
+};
+
 /* Investment Thesis — same three pillars as the Home page */
 const pillars = [
   {
     n: "01",
-    mark: "◈",
+    mark: (
+      <svg {...ICON_PROPS}>
+        <circle cx="12" cy="12" r="9" />
+        <path d="m15.5 8.5-2.1 4.9-4.9 2.1 2.1-4.9 4.9-2.1Z" />
+      </svg>
+    ),
     title: "Strategic Operational Advisory",
     text: "Direct board-level guidance and active value-add capital. We partner with professionals and executive leaders to drive operational excellence, optimize market positioning, and scale sustainable enterprise value.",
   },
   {
     n: "02",
-    mark: "◆",
+    mark: (
+      <svg {...ICON_PROPS}>
+        <path d="M3 21h18M4 10h16M12 3 4 7v3h16V7l-8-4Z" />
+        <path d="M6 10v8M10 10v8M14 10v8M18 10v8M5 18h14" />
+      </svg>
+    ),
     title: "Entrepreneurial Execution & Governance",
     text: "A 15+ year operating record applied directly. We partner with founders and executives to install institutional governance, active strategic support, and execution rigor.",
   },
   {
     n: "03",
-    mark: "◇",
+    mark: (
+      <svg {...ICON_PROPS}>
+        <path d="M3 20h18" />
+        <path d="m4 16 5-5 4 3 7-7" />
+        <path d="M15 7h5v5" />
+      </svg>
+    ),
     title: "Sector-Agnostic Growth, No Exit Pressure",
     text: "Flexible capital built around long-term asset appreciation and market position not arbitrary fund cycles. No exit panic, no forced timelines.",
+  },
+];
+
+/* What We Look to Build, Back and Acquire — one route per audience */
+// Who can come to us — its own band after "What We Look to Build", one card per audience
+const access = [
+  { who: "Promoters & owners", text: "Approach us directly.", cta: "Get in touch", href: "/contact" },
+  { who: "Advisors & introducers", text: "Bring relevant opportunities to our investment team.", cta: "Become an introducer", href: "/introducer" },
+];
+
+const routes = [
+  {
+    label: "Share a Business Idea",
+    hint: "Founders with a clear opportunity and plan",
+    href: "/contact#pitch-form",
+    icon: (
+      <svg {...ICON_PROPS}>
+        <path d="M9 18h6M10 21h4" />
+        <path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1.1 2V16h5v-.2c.1-.8.5-1.5 1.1-2A6 6 0 0 0 12 3Z" />
+      </svg>
+    ),
+  },
+  {
+    label: "Explore Executive Backing",
+    hint: "Experienced leaders building their own venture",
+    href: "/executive",
+    icon: (
+      <svg {...ICON_PROPS}>
+        <rect x="3" y="7" width="18" height="13" rx="2" />
+        <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18" />
+      </svg>
+    ),
+  },
+  {
+    label: "Discuss a Business or Asset Sale",
+    hint: "Promoters, owners, lenders and resolution cases",
+    href: "/business",
+    icon: (
+      <svg {...ICON_PROPS}>
+        <path d="M3 21h18M5 21V8l7-5 7 5v13" />
+        <path d="M9 21v-5h6v5M9 11h.01M15 11h.01" />
+      </svg>
+    ),
+  },
+  {
+    label: "Introduce an Opportunity",
+    hint: "Advisors, bankers, ARCs and insolvency professionals",
+    href: "/introducer",
+    icon: (
+      <svg {...ICON_PROPS}>
+        <circle cx="9" cy="8" r="3.2" />
+        <path d="M3 20a6 6 0 0 1 12 0" />
+        <path d="M16 4.6a3.2 3.2 0 0 1 0 6.8M18 14.4A6 6 0 0 1 21 20" />
+      </svg>
+    ),
   },
 ];
 
@@ -78,6 +155,8 @@ const css = `
    background-size:300% auto; animation:abShim 4.5s linear infinite;
    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
  }
+/* room for the italic overhang so gradient text isn't clipped */
+.ab-shim { padding-right:.12em; margin-right:-.12em; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
 
  /* ── section heading scale ──
     The section name is the heading and carries the size.
@@ -139,7 +218,7 @@ const css = `
 
  /* ═══ 2 · WHO WE ARE ═══ */
  .ab-who { background:var(--paper);
-   padding:clamp(68px,8.5vw,104px) clamp(20px,6vw,80px); scroll-margin-top:90px; }
+   padding:clamp(60px,7.5vw,90px) clamp(20px,6vw,80px); scroll-margin-top:90px; }
  .ab-who-top { display:block; }
  .ab-who-lead { margin:clamp(20px,2.4vw,28px) 0 0; max-width:760px;
    font-size:clamp(15px,1.55vw,17.5px); font-weight:300; line-height:1.82;
@@ -170,8 +249,61 @@ const css = `
    align-items:center; }
  .ab-note { font-size:12.5px; font-weight:300; color:rgba(14,16,22,.45); }
 
+ /* ═══ 2b · WHAT WE LOOK TO BUILD, BACK AND ACQUIRE ═══ */
+ .ab-wl { background:var(--paper-2); border-top:1px solid rgba(198,161,91,.18);
+   padding:clamp(60px,7.5vw,90px) clamp(20px,6vw,80px); position:relative; overflow:hidden; }
+ .ab-wl-glow { position:absolute; bottom:-240px; left:-180px; width:560px; height:560px; border-radius:50%;
+   background:radial-gradient(circle,rgba(198,161,91,.13),transparent 66%); pointer-events:none; }
+ .ab-wl-inner { position:relative; z-index:1; display:grid;
+   grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr); gap:clamp(36px,5.5vw,84px); align-items:center; }
+ .ab-wl-lead { margin:22px 0 0; max-width:54ch; font-size:clamp(17px,1.8vw,20px); font-weight:600;
+   letter-spacing:-.012em; line-height:1.5; color:var(--ink-2); }
+
+ /* ═══ 2c · WHO CAN COME TO US — its own band, one dark card per audience ═══ */
+ .ab-ways { background:var(--paper); border-top:1px solid rgba(198,161,91,.18);
+   padding:clamp(44px,5.5vw,68px) clamp(20px,6vw,80px); }
+ .ab-ways-text { margin:0 0 clamp(24px,3vw,34px); max-width:68ch; font-size:clamp(15px,1.5vw,17px); font-weight:400;
+   line-height:1.75; color:rgba(14,16,22,.7); }
+ .ab-ways-grid { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:clamp(14px,2vw,22px); }
+ .ab-way { position:relative; overflow:hidden; display:flex; flex-direction:column; border-radius:20px;
+   padding:clamp(26px,3vw,36px); background:radial-gradient(ellipse 70% 120% at 100% 0%,rgba(198,161,91,.18),transparent 60%),var(--ink-2);
+   box-shadow:0 18px 40px rgba(14,16,22,.14); }
+ .ab-way::before { content:''; position:absolute; left:0; right:0; top:0; height:2px;
+   background:linear-gradient(90deg,var(--gold),rgba(198,161,91,0)); }
+ .ab .ab-way-who { margin:0; font-size:11px; font-weight:800; letter-spacing:.22em; text-transform:uppercase;
+   line-height:1.4; color:var(--gold-lt); }
+ .ab-way-text { margin:12px 0 0; max-width:30ch; font-size:clamp(18px,1.9vw,22px); font-weight:600; letter-spacing:-.015em;
+   line-height:1.4; color:#fff; }
+ .ab-way-link { display:inline-flex; align-items:center; gap:10px; align-self:flex-start; margin-top:auto; padding-top:22px;
+   font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--gold-lt); text-decoration:none; }
+ .ab-way-link span { display:grid; place-items:center; width:30px; height:30px; border-radius:50%;
+   border:1px solid rgba(232,200,118,.4); transition:background .2s, color .2s, transform .2s; }
+ .ab-way-link:hover span { background:var(--gold); color:#14110b; transform:translateX(3px); }
+ .ab-way-link:focus-visible { outline:2px solid var(--gold-lt); outline-offset:4px; border-radius:6px; }
+
+ .ab-wl-panel { background:#fff; border:1px solid rgba(14,16,22,.08); border-radius:22px;
+   padding:10px; box-shadow:0 22px 50px rgba(138,99,48,.12); }
+ .ab-wl-panel-head { padding:16px 16px 8px; margin:0; }
+ .ab-wl-list { list-style:none; margin:0; padding:0; }
+ .ab-wl-list li + li { border-top:1px solid rgba(14,16,22,.06); }
+ .ab-wl-link { display:flex; align-items:center; gap:14px; min-height:68px; padding:14px 16px;
+   border-radius:14px; text-decoration:none; transition:background .2s; }
+ .ab-wl-link:hover { background:rgba(198,161,91,.08); }
+ .ab-wl-link:focus-visible { outline:3px solid rgba(198,161,91,.55); outline-offset:2px; }
+ .ab-wl-ico { width:42px; height:42px; border-radius:12px; flex-shrink:0; background:var(--ink-2);
+   color:var(--gold-lt); display:flex; align-items:center; justify-content:center;
+   box-shadow:0 6px 16px rgba(14,16,22,.16); }
+ .ab-wl-ico svg { width:20px; height:20px; }
+ .ab-wl-txt { flex:1; min-width:0; }
+ .ab-wl-label { display:block; font-size:15px; font-weight:700; letter-spacing:-.01em; color:var(--ink-2); }
+ .ab-wl-hint { display:block; margin-top:3px; font-size:12.5px; font-weight:400; line-height:1.45; color:rgba(14,16,22,.52); }
+ .ab-wl-arrow { width:34px; height:34px; border-radius:50%; flex-shrink:0; border:1.5px solid rgba(14,16,22,.12);
+   display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--ink-2);
+   transition:border-color .2s, background .2s, color .2s, transform .2s; }
+ .ab-wl-link:hover .ab-wl-arrow { border-color:var(--gold); background:var(--gold); color:#fff; transform:translateX(3px); }
+
  /* ═══ 3 · INVESTMENT THESIS (same as Home) ═══ */
- .ab-th { background:var(--ink); padding:clamp(72px,9vw,116px) clamp(20px,6vw,80px);
+ .ab-th { background:var(--ink); padding:clamp(62px,7.8vw,100px) clamp(20px,6vw,80px);
    position:relative; overflow:hidden; }
  .ab-th-orb { position:absolute; top:-200px; right:-120px; width:760px; height:760px; border-radius:50%;
    background:radial-gradient(circle,rgba(198,161,91,.16),transparent 65%); pointer-events:none;
@@ -195,19 +327,24 @@ const css = `
  .ab-th-mark { width:48px; height:48px; border-radius:14px; margin-bottom:20px;
    border:1px solid rgba(232,200,118,.35); background:rgba(232,200,118,.10);
    display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--gold-lt); }
+ .ab-th-mark svg { width:22px; height:22px; }
  .ab-th-title { font-size:17px; font-weight:700; color:#fff; letter-spacing:-.016em;
    line-height:1.3; margin:0 0 12px; }
  .ab-th-text { font-size:13.8px; font-weight:400; line-height:1.78; color:rgba(255,255,255,.78); margin:0; }
 
  /* ═══ 4 · VISION ═══ */
  .ab-vis { background:linear-gradient(180deg,var(--paper) 0%,var(--paper-2) 100%);
-   padding:clamp(72px,9vw,112px) clamp(20px,6vw,80px); position:relative; overflow:hidden; }
- .ab-vis::before { content:'"'; position:absolute; top:-46px; left:clamp(20px,6vw,80px);
-   font-size:clamp(180px,18vw,280px); font-weight:800; color:rgba(198,161,91,.13); line-height:1;
-   pointer-events:none; user-select:none; }
+   padding:clamp(62px,7.8vw,96px) clamp(20px,6vw,80px); position:relative; overflow:hidden; }
  .ab-vis-inner { position:relative; z-index:1; max-width:920px; }
- .ab-vis-stmt { margin:20px 0 30px; max-width:760px; font-size:clamp(16px,1.7vw,19px);
+ .ab-vis-stmt { position:relative; margin:20px 0 30px; max-width:760px; font-size:clamp(16px,1.7vw,19px);
    font-weight:300; line-height:1.78; color:rgba(14,16,22,.68); }
+ /* a matching pair of serif quote marks frames the statement: one opens above the
+    title, the other closes just past the last line */
+ .ab-vis-inner::before, .ab-vis-stmt::after { position:absolute; z-index:-1; pointer-events:none; user-select:none;
+   font-family:Georgia,'Times New Roman',serif; font-size:clamp(120px,12vw,180px); font-weight:400; line-height:1;
+   color:rgba(198,161,91,.26); }
+ .ab-vis-inner::before { content:'“'; top:-.3em; left:-.52em; }
+ .ab-vis-stmt::after { content:'”'; right:-.42em; bottom:-.78em; }
  .ab-vis-stmt strong { font-weight:700; color:var(--ink-2); }
  .ab-vis-attr { font-size:9px; font-weight:800; letter-spacing:.26em; text-transform:uppercase;
    color:rgba(14,16,22,.34); display:flex; align-items:center; gap:12px; margin-bottom:34px; }
@@ -216,7 +353,7 @@ const css = `
 
  /* ═══ 5 · CTA ═══ */
  .ab-cta { position:relative; overflow:hidden; text-align:center;
-   padding:clamp(80px,11vw,120px) clamp(20px,6vw,80px);
+   padding:clamp(70px,9.5vw,104px) clamp(20px,6vw,80px);
    background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(198,161,91,.26),transparent 62%),
      linear-gradient(180deg,var(--ink-2),#070a0e); }
  .ab-cta-grain { position:absolute; inset:0; pointer-events:none; opacity:.30;
@@ -264,8 +401,24 @@ const css = `
  @media(max-width:1024px){
    .ab-th-grid { grid-template-columns:1fr 1fr; }
  }
+ @media(max-width:960px){
+   .ab-wl-inner { grid-template-columns:1fr; }
+   .ab-wl-panel { max-width:620px; }
+ }
  @media(max-width:900px){
    .ab-video-wrap { height:56svh; min-height:360px; }
+ }
+ @media(max-width:560px){
+   .ab-ways-grid { grid-template-columns:1fr; }
+   /* headings keep the shared gutter; the link panel bleeds a little wider for room */
+   .ab-wl-panel { margin-inline:-14px; padding:6px; border-radius:18px; }
+   .ab-wl-link { padding:14px 12px; gap:12px; }
+   .ab-wl-arrow { width:30px; height:30px; }
+ }
+ @media(max-width:1100px){
+   /* not enough side room to hang the marks outside the text, so tuck them behind it */
+   .ab-vis-inner::before { left:-.12em; top:-.36em; font-size:110px; }
+   .ab-vis-stmt::after { right:0; bottom:-.72em; font-size:110px; }
  }
  @media(max-width:720px){
    .ab-th-grid { grid-template-columns:1fr; }
@@ -514,6 +667,68 @@ export default function AboutPage() {
               before.
             </span>
           </div>
+        </div>
+      </section>
+
+      {/* ══ 2b · WHAT WE LOOK TO BUILD, BACK AND ACQUIRE ══ */}
+      <section className="ab-wl" aria-labelledby="ab-wl-title">
+        <div className="ab-wl-glow" />
+        <div className="container ab-wl-inner">
+          <div>
+            <h2 id="ab-wl-title" className="ab-sec-title ab-sec-title-l">
+              What We Look to Build, Back and Acquire
+            </h2>
+            <span className="ab-sec-rule ab-sec-rule-l" />
+
+            <p className="ab-wl-lead">
+              IdeaTown Investments deploys direct principal capital into
+              opportunities where a clear business case, capable leadership and
+              practical execution can create long-term value.
+            </p>
+
+          </div>
+
+          <nav className="ab-wl-panel" aria-label="Ways to work with IdeaTown">
+            <p className="ab-eyebrow ab-eyebrow-l ab-wl-panel-head">Start the right conversation</p>
+            <ul className="ab-wl-list">
+              {routes.map((r) => (
+                <li key={r.href}>
+                  <Link href={r.href} className="ab-wl-link">
+                    <span className="ab-wl-ico">{r.icon}</span>
+                    <span className="ab-wl-txt">
+                      <span className="ab-wl-label">{r.label}</span>
+                      <span className="ab-wl-hint">{r.hint}</span>
+                    </span>
+                    <span className="ab-wl-arrow" aria-hidden="true">→</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+      </section>
+
+      {/* ══ 2c · WHO CAN COME TO US ══ */}
+      <section className="ab-ways" aria-label="Who can approach IdeaTown">
+        <div className="container">
+          <p className="ab-ways-text">
+            We evaluate founder-led businesses, ventures proposed by
+            experienced executives, operating business acquisitions and
+            strategic asset sales. Our acquisition interests also include
+            businesses undergoing restructuring, lender-led sales and
+            resolution processes across India.
+          </p>
+          <ul className="ab-ways-grid">
+            {access.map((a) => (
+              <li key={a.who} className="ab-way">
+                <h3 className="ab-way-who">{a.who}</h3>
+                <p className="ab-way-text">{a.text}</p>
+                <Link href={a.href} className="ab-way-link">
+                  {a.cta} <span aria-hidden="true">→</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 

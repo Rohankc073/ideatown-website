@@ -11,6 +11,46 @@ export const runtime = "nodejs";
 // UPLOAD_DIR and from Distress's UPLOAD_DIR_DISTRESS.
 const UPLOAD_DIR = process.env.UPLOAD_DIR_EXECUTIVE || "./uploads-executive";
 
+// Same limits the form enforces in the browser — checked again here so a
+// request sent straight to the API can't bypass them.
+const MAX_FILE_SIZE = 25 * 1024 * 1024;    // 25MB per file
+const MAX_TOTAL_SIZE = 95 * 1024 * 1024;   // 95MB per submission (keeps the request under a 100MB proxy cap)
+const MAX_ADDITIONAL_FILES = 10;
+const FILE_FIELDS = [
+  "pitch_deck",
+  "financial_projection",
+  "business_plan",
+  "supporting_material",
+  "additional_documents",
+];
+
+// Tokens are UUIDs (or a letters/digits/hyphens fallback). Anything else —
+// "..", slashes — could point the upload folder outside UPLOAD_DIR.
+const TOKEN_RE = /^[A-Za-z0-9-]{8,64}$/;
+
+function validateFiles(formData) {
+  let total = 0;
+  const oversized = [];
+  for (const field of FILE_FIELDS) {
+    for (const file of formData.getAll(field)) {
+      if (file && typeof file === "object" && typeof file.size === "number") {
+        if (file.size > MAX_FILE_SIZE) oversized.push(file.name);
+        total += file.size;
+      }
+    }
+  }
+  if (oversized.length) {
+    return `File(s) exceed the ${MAX_FILE_SIZE / 1024 / 1024}MB limit: ${oversized.join(", ")}`;
+  }
+  if (total > MAX_TOTAL_SIZE) {
+    return `Total upload size exceeds the ${MAX_TOTAL_SIZE / 1024 / 1024}MB limit for this submission.`;
+  }
+  if (formData.getAll("additional_documents").length > MAX_ADDITIONAL_FILES) {
+    return `You can attach up to ${MAX_ADDITIONAL_FILES} additional documents.`;
+  }
+  return null;
+}
+
 // Save one file to disk + return its metadata with URL
 async function saveFile(file, token, category) {
   const folder = path.join(UPLOAD_DIR, token, category);
@@ -52,8 +92,6 @@ async function saveCategory(formData, fieldName, token) {
 
 export async function POST(request) {
   try {
-    await connectDB();
-
     const formData = await request.formData();
     const rawData = formData.get("data");
 
@@ -64,9 +102,17 @@ export async function POST(request) {
     const data = JSON.parse(rawData);
     const { token } = data;
 
-    if (!token) {
-      return NextResponse.json({ error: "Missing token" }, { status: 400 });
+    if (typeof token !== "string" || !TOKEN_RE.test(token)) {
+      return NextResponse.json({ error: "Invalid or missing token" }, { status: 400 });
     }
+
+    // Enforce size limits before anything touches disk
+    const fileError = validateFiles(formData);
+    if (fileError) {
+      return NextResponse.json({ error: fileError }, { status: 413 });
+    }
+
+    await connectDB();
 
     // Reject duplicates BEFORE uploading any files (saves work)
     const existing = await Executive.findOne({ token });

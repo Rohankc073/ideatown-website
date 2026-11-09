@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
+import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 
 import { connectDB } from "../../../lib/mongodb";
@@ -78,6 +78,11 @@ export async function POST(req) {
             fileName
         );
 
+        // public/uploads is not in the repository (nothing is committed inside
+        // it), so a fresh checkout has no such directory and writeFile throws
+        // ENOENT — the route answered 500 and the lead, deck and all, was
+        // lost with no record anywhere. Create it rather than assume it.
+        await mkdir(path.dirname(filePath), { recursive: true });
         await writeFile(filePath, buffer);
 
         const fileUrl = `/uploads/${fileName}`;

@@ -3,214 +3,251 @@ import Footer from "@/components/Footer";
 import GlobalFootprint from "@/components/GlobalFootprint";
 import Header from "@/components/Header";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-
+import { useEffect, useRef, useState } from "react";
 
 /* ─────────── CONTENT ───────────
   `markets` on each sector fills the chips at the bottom of the panel.
   `hint` is the one-line summary shown next to the sector name in the list.
 ─────────────────────────────── */
 
-
 const sectors = [
- {
-   id: "real-estate",
-   num: "01",
-   icon: "estate",
-   name: "Real Estate & Development",
-   hint: "Build, hold, appreciate",
-   lede: "Commercial, residential, and vacation assets held for appreciation and scale.",
-   focus: [
-     "Commercial & Residential Construction",
-     "Premier Vacation Home Portfolios",
-     "Real Asset Development",
-   ],
-   footprint:
-     "Capitalizing prime commercial builds, residential projects, and high-yield vacation asset portfolios seeking long-term appreciation and scale.",
-   markets: ["United Arab Emirates", "India", "United Kingdom"],
- },
- {
-   id: "gems",
-   num: "02",
-   icon: "gem",
-   name: "Gems & Jewellery",
-   hint: "Process, manufacture, distribute",
-   lede: "Precious material processing, precision manufacturing, and distribution.",
-   focus: [
-     "Precious Metal Processing",
-     "High-End Manufacturing",
-     "Supply Chain Scaling",
-   ],
-   footprint:
-     "Supporting end-to-end precious material processing, precision manufacturing facilities, and international distribution networks.",
-   markets: ["India", "United Arab Emirates"],
- },
- {
-   id: "healthcare",
-   num: "03",
-   icon: "health",
-   name: "Healthcare & Pharma",
-   hint: "Hospitals, clinics, supply chains",
-   lede: "Health infrastructure, from hospital floors to pharmaceutical supply.",
-   focus: [
-     "Hospital Operations",
-     "Specialized Care Facilities",
-     "Formulations & Distribution Networks",
-   ],
-   footprint:
-     "Funding essential health infrastructure — spanning hospital management, specialized clinical facilities, and pharmaceutical supply chains.",
-   markets: ["India"],
- },
- {
-   id: "hospitality",
-   num: "04",
-   icon: "leisure",
-   name: "Hospitality & Leisure",
-   hint: "Hotels, venues, nightlife",
-   lede: "Nightlife destinations, boutique hotels, and the systems that run them.",
-   focus: [
-     "Premium Nightlife Destinations",
-     "Luxury Boutique Hotels",
-     "Venue Management",
-   ],
-   footprint:
-     "Structuring and scaling iconic leisure assets, boutique hotel experiences, and premier venue management systems.",
-   markets: ["United Arab Emirates", "United Kingdom"],
- },
- {
-   id: "software",
-   num: "05",
-   icon: "software",
-   name: "IT & Software Services",
-   hint: "Enterprise systems and infrastructure",
-   lede: "Enterprise software and the digital backbones businesses run on.",
-   focus: [
-     "Enterprise Technology Solutions",
-     "Software Development",
-     "Digital Infrastructure",
-   ],
-   footprint:
-     "Backing custom enterprise software development, digital backbones, and mission-critical technology solutions.",
-   markets: ["India", "United Kingdom"],
- },
- {
-   id: "staffing",
-   num: "06",
-   icon: "people",
-   name: "Human Capital & Staffing",
-   hint: "Workforce at volume",
-   lede: "Workforce architecture at volume, and placement at the top end.",
-   focus: [
-     "Corporate Workforce Solutions",
-     "Permanent Placement",
-     "Specialized Staffing",
-   ],
-   footprint:
-     "Scaling high-volume workforce architectures, permanent executive placement, and corporate talent solutions.",
-   markets: ["India", "United Arab Emirates"],
- },
+  {
+    id: "real-estate",
+    num: "01",
+    icon: "estate",
+    name: "Real Estate & Development",
+    hint: "Build, hold, appreciate",
+    lede: "Commercial, residential, and vacation assets held for appreciation and scale.",
+    focus: [
+      "Commercial & Residential Construction",
+      "Premier Vacation Home Portfolios",
+      "Real Asset Development",
+    ],
+    footprint:
+      "Capitalizing prime commercial builds, residential projects, and high-yield vacation asset portfolios seeking long-term appreciation and scale.",
+    markets: ["United Arab Emirates", "India", "United Kingdom"],
+  },
+  {
+    id: "gems",
+    num: "02",
+    icon: "gem",
+    name: "Gems & Jewellery",
+    hint: "Process, manufacture, distribute",
+    lede: "Precious material processing, precision manufacturing, and distribution.",
+    focus: [
+      "Precious Metal Processing",
+      "High-End Manufacturing",
+      "Supply Chain Scaling",
+    ],
+    footprint:
+      "Supporting end-to-end precious material processing, precision manufacturing facilities, and international distribution networks.",
+    markets: ["India", "United Arab Emirates"],
+  },
+  {
+    id: "healthcare",
+    num: "03",
+    icon: "health",
+    name: "Healthcare & Pharma",
+    hint: "Hospitals, clinics, supply chains",
+    lede: "Health infrastructure, from hospital floors to pharmaceutical supply.",
+    focus: [
+      "Hospital Operations",
+      "Specialized Care Facilities",
+      "Formulations & Distribution Networks",
+    ],
+    footprint:
+      "Funding essential health infrastructure — spanning hospital management, specialized clinical facilities, and pharmaceutical supply chains.",
+    markets: ["India"],
+  },
+  {
+    id: "hospitality",
+    num: "04",
+    icon: "leisure",
+    name: "Hospitality & Leisure",
+    hint: "Hotels, venues, nightlife",
+    lede: "Nightlife destinations, boutique hotels, and the systems that run them.",
+    focus: [
+      "Premium Nightlife Destinations",
+      "Luxury Boutique Hotels",
+      "Venue Management",
+    ],
+    footprint:
+      "Structuring and scaling iconic leisure assets, boutique hotel experiences, and premier venue management systems.",
+    markets: ["United Arab Emirates", "United Kingdom"],
+  },
+  {
+    id: "software",
+    num: "05",
+    icon: "software",
+    name: "IT & Software Services",
+    hint: "Enterprise systems and infrastructure",
+    lede: "Enterprise software and the digital backbones businesses run on.",
+    focus: [
+      "Enterprise Technology Solutions",
+      "Software Development",
+      "Digital Infrastructure",
+    ],
+    footprint:
+      "Backing custom enterprise software development, digital backbones, and mission-critical technology solutions.",
+    markets: ["India", "United Kingdom"],
+  },
+  {
+    id: "staffing",
+    num: "06",
+    icon: "people",
+    name: "Human Capital & Staffing",
+    hint: "Workforce at volume",
+    lede: "Workforce architecture at volume, and placement at the top end.",
+    focus: [
+      "Corporate Workforce Solutions",
+      "Permanent Placement",
+      "Specialized Staffing",
+    ],
+    footprint:
+      "Scaling high-volume workforce architectures, permanent executive placement, and corporate talent solutions.",
+    markets: ["India", "United Arab Emirates"],
+  },
 ];
 
+/* hero carousel photography, one per sector — 1200×1500 crops (Unsplash License) */
+const heroMedia = {
+  "real-estate": {
+    src: "/assets/portfolio-realestate.jpg",
+    alt: "City skyline of glass towers at golden hour",
+    w: 1200,
+    h: 1500,
+    pos: "50% 50%",
+  },
+  gems: {
+    src: "/assets/portfolio-gems.jpg",
+    alt: "Pear-cut diamond halo ring on a dark surface",
+    w: 1200,
+    h: 1500,
+    pos: "50% 50%",
+  },
+  healthcare: {
+    src: "/assets/portfolio-healthcare.jpg",
+    alt: "Modern hospital operating theatre",
+    w: 1200,
+    h: 1500,
+    pos: "50% 50%",
+  },
+  hospitality: {
+    src: "/assets/portfolio-hospitality.jpg",
+    alt: "Luxury hotel lobby with a chandelier and marble floor",
+    w: 1200,
+    h: 1500,
+    pos: "50% 50%",
+  },
+  software: {
+    src: "/assets/portfolio-software.jpg",
+    alt: "Monitors showing source code beside a backlit keyboard",
+    w: 1200,
+    h: 1500,
+    pos: "50% 50%",
+  },
+  staffing: {
+    src: "/assets/portfolio-staffing.jpg",
+    alt: "Candidate speaking with an interviewer across a table",
+    w: 1200,
+    h: 1500,
+    pos: "50% 50%",
+  },
+};
+
+const MARKET_SHORT = { "United Arab Emirates": "UAE", "United Kingdom": "UK" };
 
 /* ─────────── ICONS ───────────
   Line icons on a 24px grid, inheriting colour and stroke weight.
 ─────────────────────────────── */
 const icons = {
- /* Real Estate & Development — a skyline, not a single house */
- estate: (
-   <>
-     <path d="M2.5 21h19" />
-     <path d="M5 21V6.4a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1V21" />
-     <path d="M12 21V10.6h6.2a1 1 0 0 1 1 1V21" />
-     <path d="M7.4 8.8h2.2M7.4 12.4h2.2M7.4 16h2.2" />
-     <path d="M14.6 14h2.2M14.6 17.4h2.2" />
-   </>
- ),
+  /* Real Estate & Development — a skyline, not a single house */
+  estate: (
+    <>
+      <path d="M2.5 21h19" />
+      <path d="M5 21V6.4a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1V21" />
+      <path d="M12 21V10.6h6.2a1 1 0 0 1 1 1V21" />
+      <path d="M7.4 8.8h2.2M7.4 12.4h2.2M7.4 16h2.2" />
+      <path d="M14.6 14h2.2M14.6 17.4h2.2" />
+    </>
+  ),
 
+  /* Gems & Jewellery — a brilliant cut with its facets */
+  gem: (
+    <>
+      <path d="M12 21.2 2.9 9.7 6.1 3.4h11.8l3.2 6.3z" />
+      <path d="M2.9 9.7h18.2" />
+      <path d="M8.4 9.7 12 21.2l3.6-11.5" />
+      <path d="M6.1 3.4 8.4 9.7M17.9 3.4 15.6 9.7M12 3.4v6.3" />
+    </>
+  ),
 
- /* Gems & Jewellery — a brilliant cut with its facets */
- gem: (
-   <>
-     <path d="M12 21.2 2.9 9.7 6.1 3.4h11.8l3.2 6.3z" />
-     <path d="M2.9 9.7h18.2" />
-     <path d="M8.4 9.7 12 21.2l3.6-11.5" />
-     <path d="M6.1 3.4 8.4 9.7M17.9 3.4 15.6 9.7M12 3.4v6.3" />
-   </>
- ),
+  /* Healthcare & Pharma — heart with a vital sign through it */
+  health: (
+    <>
+      <path d="M12 20.4 4.6 13.1a4.75 4.75 0 1 1 7.4-5.8 4.75 4.75 0 1 1 7.4 5.8z" />
+      <path d="M6.6 12.4h2.6l1.3-2.7 1.9 4.7 1.3-2h3.7" />
+    </>
+  ),
 
+  /* Hospitality & Leisure — the concierge bell */
+  leisure: (
+    <>
+      <path d="M2.8 19.6h18.4" />
+      <path d="M4.6 16.4a7.4 7.4 0 0 1 14.8 0z" />
+      <path d="M12 6.6v2.4" />
+      <circle cx="12" cy="5.1" r="1.3" />
+    </>
+  ),
 
- /* Healthcare & Pharma — heart with a vital sign through it */
- health: (
-   <>
-     <path d="M12 20.4 4.6 13.1a4.75 4.75 0 1 1 7.4-5.8 4.75 4.75 0 1 1 7.4 5.8z" />
-     <path d="M6.6 12.4h2.6l1.3-2.7 1.9 4.7 1.3-2h3.7" />
-   </>
- ),
+  /* IT & Software Services — stacked infrastructure */
+  software: (
+    <>
+      <rect x="3" y="4" width="18" height="6.4" rx="2" />
+      <rect x="3" y="13.6" width="18" height="6.4" rx="2" />
+      <circle cx="7" cy="7.2" r="0.9" />
+      <circle cx="7" cy="16.8" r="0.9" />
+      <path d="M11 7.2h6M11 16.8h6" />
+    </>
+  ),
 
+  /* Human Capital & Staffing — a team, not a person */
+  people: (
+    <>
+      <circle cx="9.2" cy="8.2" r="3.4" />
+      <path d="M2.9 20.3a6.3 6.3 0 0 1 12.6 0" />
+      <path d="M16.4 5.2a3.4 3.4 0 0 1 0 6" />
+      <path d="M17.8 14.5a6.3 6.3 0 0 1 3.4 5.8" />
+    </>
+  ),
 
- /* Hospitality & Leisure — the concierge bell */
- leisure: (
-   <>
-     <path d="M2.8 19.6h18.4" />
-     <path d="M4.6 16.4a7.4 7.4 0 0 1 14.8 0z" />
-     <path d="M12 6.6v2.4" />
-     <circle cx="12" cy="5.1" r="1.3" />
-   </>
- ),
-
-
- /* IT & Software Services — stacked infrastructure */
- software: (
-   <>
-     <rect x="3" y="4" width="18" height="6.4" rx="2" />
-     <rect x="3" y="13.6" width="18" height="6.4" rx="2" />
-     <circle cx="7" cy="7.2" r="0.9" />
-     <circle cx="7" cy="16.8" r="0.9" />
-     <path d="M11 7.2h6M11 16.8h6" />
-   </>
- ),
-
-
- /* Human Capital & Staffing — a team, not a person */
- people: (
-   <>
-     <circle cx="9.2" cy="8.2" r="3.4" />
-     <path d="M2.9 20.3a6.3 6.3 0 0 1 12.6 0" />
-     <path d="M16.4 5.2a3.4 3.4 0 0 1 0 6" />
-     <path d="M17.8 14.5a6.3 6.3 0 0 1 3.4 5.8" />
-   </>
- ),
-
-
- pin: (
-   <>
-     <path d="M12 21s6.5-6.1 6.5-10.5a6.5 6.5 0 1 0-13 0C5.5 14.9 12 21 12 21z" />
-     <circle cx="12" cy="10.5" r="2.5" />
-   </>
- ),
+  pin: (
+    <>
+      <path d="M12 21s6.5-6.1 6.5-10.5a6.5 6.5 0 1 0-13 0C5.5 14.9 12 21 12 21z" />
+      <circle cx="12" cy="10.5" r="2.5" />
+    </>
+  ),
 };
 
-
 function Icon({ name, size = 22 }) {
- return (
-   <svg
-     className="pf-icon"
-     width={size}
-     height={size}
-     viewBox="0 0 24 24"
-     fill="none"
-     stroke="currentColor"
-     strokeWidth="1.5"
-     strokeLinecap="round"
-     strokeLinejoin="round"
-     aria-hidden="true"
-     focusable="false"
-   >
-     {icons[name]}
-   </svg>
- );
+  return (
+    <svg
+      className="pf-icon"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {icons[name]}
+    </svg>
+  );
 }
-
 
 const css = `
  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,600&family=Inter+Tight:wght@300;400;500;600;700;800&display=swap');
@@ -252,6 +289,7 @@ const css = `
  @keyframes pfSlide  { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:none} }
  @keyframes pfPulse  { 0%,100%{box-shadow:0 0 0 0 rgba(198,161,91,.55)} 50%{box-shadow:0 0 0 9px rgba(198,161,91,0)} }
  @keyframes pfOrb    { 0%,100%{transform:translate(0,0) scale(1)} 40%{transform:translate(26px,-18px) scale(1.05)} 70%{transform:translate(-14px,14px) scale(.97)} }
+ @keyframes pfZoom   { from{transform:scale(1.02)} to{transform:scale(1.12)} }
  @keyframes pfMarquee{ from{transform:translate3d(0,0,0)} to{transform:translate3d(-50%,0,0)} }
 
 
@@ -259,9 +297,13 @@ const css = `
  .pf-shim { font-family:var(--serif); font-style:italic; font-weight:600; letter-spacing:-.01em;
    background:linear-gradient(105deg,#8b5e1a,#b8863b 42%,#d9ab55 60%,#8b5e1a);
    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+/* room for the italic overhang so gradient text isn't clipped */
+.pf-shim { padding-right:.12em; margin-right:-.12em; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
  .pf-shim-d { font-family:var(--serif); font-style:italic; font-weight:600; letter-spacing:-.01em;
    background:linear-gradient(105deg,#c6a15b,#f0dda0 45%,#c6a15b);
    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+/* room for the italic overhang so gradient text isn't clipped */
+.pf-shim-d { padding-right:.12em; margin-right:-.12em; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
 
 
  /* section heading scale — the section name leads, the line under it supports */
@@ -301,7 +343,64 @@ const css = `
    width:520px; height:520px; top:-200px; right:-120px;
    background:radial-gradient(circle,rgba(198,161,91,.18),transparent 65%);
    animation:pfOrb 26s ease-in-out infinite; }
- .pf-hero-in { position:relative; z-index:2; padding-bottom:clamp(48px,6vw,76px); }
+ .pf-hero-in { position:relative; z-index:2; padding-bottom:clamp(50px,6.2vw,80px); }
+ .pf-hero-grid { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr); gap:clamp(40px,5.5vw,84px); align-items:center; }
+ .pf-hero-copy { min-width:0; }
+
+ /* image panel — six-sector carousel inside an offset gold outline */
+ .pf-hero-media { position:relative; margin-right:22px; animation:pfUp 1s cubic-bezier(.22,.68,0,1.1) .18s both; }
+ .pf-hero-media::before { content:""; position:absolute; top:22px; left:22px; right:-22px; bottom:-22px; z-index:0;
+   border:1.5px solid rgba(198,161,91,.55); border-radius:30px; pointer-events:none; }
+ .pf-car { position:relative; z-index:1; aspect-ratio:4/5; border-radius:28px; overflow:hidden; background:#0b0d10; isolation:isolate;
+   touch-action:pan-y; box-shadow:0 44px 90px -34px rgba(15,20,26,.55), 0 0 0 1px rgba(198,161,91,.22); }
+ .pf-car-slide { position:absolute; inset:0; margin:0; opacity:0; visibility:hidden;
+   transition:opacity .9s ease, visibility 0s linear .9s; }
+ .pf-car-slide.is-on { opacity:1; visibility:visible; transition:opacity .9s ease; }
+ .pf-car-slide img { display:block; width:100%; height:100%; object-fit:cover; transform:scale(1.08);
+   transition:transform 7s cubic-bezier(.2,.6,.3,1); }
+ .pf-car-slide.is-on img { transform:scale(1); }
+ .pf-car-slide::after { content:""; position:absolute; inset:0; z-index:1; pointer-events:none;
+   background:linear-gradient(180deg,rgba(10,12,15,.46) 0%,rgba(10,12,15,0) 20%,rgba(10,12,15,0) 36%,rgba(10,12,15,.88) 100%); }
+
+ .pf-car-cap { position:absolute; z-index:2; left:26px; right:26px; bottom:24px; color:#fff; }
+ .pf-car-cap > * { opacity:0; transform:translateY(12px); transition:opacity .6s ease, transform .7s cubic-bezier(.22,.68,0,1.1); }
+ .pf-car-slide.is-on .pf-car-cap > * { opacity:1; transform:none; }
+ .pf-car-slide.is-on .pf-car-cap > :nth-child(1) { transition-delay:.22s; }
+ .pf-car-slide.is-on .pf-car-cap > :nth-child(2) { transition-delay:.3s; }
+ .pf-car-slide.is-on .pf-car-cap > :nth-child(3) { transition-delay:.38s; }
+ .pf-car-slide.is-on .pf-car-cap > :nth-child(4) { transition-delay:.46s; }
+ .pf-car-count { display:block; font-size:11px; font-weight:700; letter-spacing:.22em; color:rgba(255,255,255,.62); }
+ .pf-car-count b { color:var(--gold-lt); font-weight:800; }
+ .pf .pf-car-name { margin:10px 0 0; font-family:inherit; font-size:clamp(23px,2.2vw,31px); font-weight:700;
+   letter-spacing:-.022em; line-height:1.1; color:#fff; }
+ .pf-car-lede { margin:9px 0 0; font-size:14px; line-height:1.6; color:rgba(255,255,255,.80); max-width:36ch; }
+ .pf-car-mkts { display:flex; flex-wrap:wrap; gap:6px; margin-top:16px; padding-right:104px; }
+ .pf-car-mkts span { padding:6px 11px; border-radius:999px; font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
+   color:#fff; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.24);
+   backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+
+ /* story-style progress bars: the active bar fills, and finishing it advances the slide */
+ .pf-car-bars { position:absolute; z-index:3; top:14px; left:20px; right:20px; display:flex; gap:6px; }
+ .pf-car-bar { position:relative; flex:1 1 0; height:22px; padding:0; border:0; background:none; cursor:pointer; }
+ .pf-car-bar::before, .pf-car-bar span { content:""; position:absolute; left:0; right:0; top:50%; height:3px; margin-top:-1.5px; border-radius:3px; }
+ .pf-car-bar::before { background:rgba(255,255,255,.28); transition:background .2s ease; }
+ .pf-car-bar:hover::before { background:rgba(255,255,255,.5); }
+ .pf-car-bar span { display:block; background:var(--gold-lt); transform:scaleX(0); transform-origin:0 50%; }
+ .pf-car-bar.is-done span { transform:scaleX(1); }
+ .pf-car-bar.is-on span { animation:pfBar 6s linear forwards; }
+ .pf-car.is-paused .pf-car-bar.is-on span { animation-play-state:paused; }
+ .pf-car-bar:focus-visible { outline:2px solid #fff; outline-offset:2px; border-radius:4px; }
+ @keyframes pfBar { from{transform:scaleX(0)} to{transform:scaleX(1)} }
+
+ .pf-car-nav { position:absolute; z-index:3; right:20px; bottom:22px; display:flex; gap:8px; }
+ .pf-car-nav button { display:grid; place-items:center; width:44px; height:44px; padding:0; border-radius:50%; cursor:pointer;
+   color:#fff; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.3);
+   backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+   transition:background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease; }
+ .pf-car-nav button:hover { background:var(--gold); border-color:var(--gold); color:#14110b; }
+ .pf-car-nav button:active { transform:scale(.94); }
+ .pf-car-nav button:focus-visible { outline:2px solid #fff; outline-offset:2px; }
+ .pf-car-nav svg { width:18px; height:18px; }
 
 
  .pf-chip { display:inline-flex; align-items:center; gap:10px; padding:9px 17px; border-radius:999px;
@@ -311,20 +410,20 @@ const css = `
  .pf-chip-dot { width:7px; height:7px; border-radius:50%; background:var(--gold);
    animation:pfPulse 2.6s ease infinite; flex-shrink:0; }
  .pf-h1 { margin:26px 0 0; font-weight:700; letter-spacing:-.040em; line-height:1.0;
-   font-size:clamp(38px,5.6vw,78px); color:var(--text); max-width:16ch;
+   font-size:clamp(36px,4.6vw,68px); color:var(--text);
    animation:pfUp .9s cubic-bezier(.22,.68,0,1.1) .08s both; }
- .pf-h1 span { display:block; }
+ .pf-h1 span { display:block; white-space:nowrap; }
 
 
- .pf-hero-split { margin-top:clamp(32px,4vw,48px); padding-top:clamp(28px,3.2vw,38px);
-   border-top:1px solid var(--line-gold);
+ .pf-hero-split { margin-top:clamp(28px,3.4vw,40px);
    animation:pfUp .9s cubic-bezier(.22,.68,0,1.1) .2s both; }
- .pf-hero-kick { margin:0; font-size:clamp(17px,1.85vw,22px); font-weight:600;
-   letter-spacing:-.016em; line-height:1.42; color:var(--text); }
- .pf-hero-lead { margin:16px 0 0; font-size:15px; font-weight:300; line-height:1.85;
-   color:var(--text-2); max-width:640px; }
- .pf-hero-btns { margin-top:30px; display:flex; gap:12px; flex-wrap:wrap; }
-
+ .pf-hero-intro { position:relative; padding-left:22px; max-width:540px; }
+ .pf-hero-intro::before { content:""; position:absolute; left:0; top:4px; bottom:6px; width:2px; border-radius:2px;
+   background:linear-gradient(180deg,var(--gold),rgba(198,161,91,.12)); }
+ .pf-hero-kick { margin:0; font-size:clamp(17px,1.5vw,19px); font-weight:600;
+   letter-spacing:-.012em; line-height:1.4; color:var(--text); }
+ .pf-hero-lead { margin:10px 0 0; font-size:15.5px; font-weight:400; line-height:1.75; color:var(--text-2); }
+ .pf-hero-btns { margin-top:32px; display:flex; gap:12px; flex-wrap:wrap; }
 
  /* full-bleed sector ticker, bridging into the dark sector section */
  .pf-ticker { position:relative; z-index:2; overflow:hidden; padding:20px 0;
@@ -344,7 +443,7 @@ const css = `
 
 
  /* ═══════════ 2 · SECTORS ═══════════ */
- .pf-sec { position:relative; overflow:hidden; padding:clamp(66px,8.5vw,108px) 0;
+ .pf-sec { position:relative; overflow:hidden; padding:clamp(58px,7.4vw,94px) 0;
    background:radial-gradient(900px 620px at 8% 0%,rgba(198,161,91,.14),transparent 58%),
      radial-gradient(700px 520px at 100% 100%,rgba(198,161,91,.08),transparent 55%),
      linear-gradient(180deg,#0a0c0f,#07080a); }
@@ -417,7 +516,7 @@ const css = `
 
 
  /* ═══════════ 3 · GEOGRAPHY ═══════════ */
- .pf-geo { background:linear-gradient(180deg,var(--paper),#F3F0E9); padding:clamp(66px,8.5vw,108px) 0; }
+ .pf-geo { background:linear-gradient(180deg,var(--paper),#F3F0E9); padding:clamp(58px,7.4vw,94px) 0; }
  .pf-geo-head { display:flex; align-items:flex-end; justify-content:space-between; gap:24px;
    flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:26px; }
  .pf-geo-note { display:flex; align-items:center; gap:10px; font-size:13px; font-weight:500;
@@ -426,7 +525,7 @@ const css = `
 
 
  /* ═══════════ 4 · CTA ═══════════ */
- .pf-cta { position:relative; overflow:hidden; text-align:center; padding:clamp(78px,10vw,116px) 0;
+ .pf-cta { position:relative; overflow:hidden; text-align:center; padding:clamp(68px,8.6vw,100px) 0;
    background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(198,161,91,.24),transparent 62%),
      linear-gradient(180deg,var(--ink-2),#070a0e); }
  .pf-cta-ring { position:absolute; top:50%; left:50%; border-radius:50%;
@@ -465,7 +564,26 @@ const css = `
  @media(max-width:1024px){
    .pf-sec-grid { grid-template-columns:1fr; }
  }
+ @media(max-width:900px){
+   .pf-hero-grid { grid-template-columns:1fr; }
+   .pf-h1 { font-size:clamp(36px,11vw,64px); }
+   .pf-hero-media { margin:6px 16px 0 0; }
+   .pf-car { aspect-ratio:4/3; }
+ }
+ @media(max-width:480px){
+   .pf-hero-media::before { top:14px; left:14px; right:-14px; bottom:-14px; border-radius:24px; }
+   .pf-hero-media { margin-right:14px; }
+   .pf-car { aspect-ratio:4/5; border-radius:22px; }
+   .pf-car-cap { left:18px; right:18px; bottom:18px; }
+   .pf-car-lede { font-size:13px; }
+   .pf-car-mkts { padding-right:96px; }
+   .pf-car-nav { right:14px; bottom:16px; gap:6px; }
+   .pf-car-bars { left:14px; right:14px; top:10px; gap:5px; }
+   .pf-hero-intro { padding-left:18px; }
+ }
  @media(max-width:760px){
+   /* phones: the photo carousel only adds scroll — the sector list below covers the same ground */
+   .pf-hero-media { display:none; }
    .pf-h1 { max-width:none; }
    .pf-hero-btns .pf-btn-gold, .pf-hero-btns .pf-btn-outline { flex:1 1 100%; justify-content:center; }
    .pf-row { padding:14px 16px; gap:12px; }
@@ -473,268 +591,393 @@ const css = `
  @media(prefers-reduced-motion:reduce){
    .pf *, .pf *::before, .pf *::after { animation:none !important; transition-duration:.01ms !important; }
    .pf-ticker-track { animation:none !important; }
+   .pf-car-bar.is-on span { transform:scaleX(1); }
  }
 `;
 
-
 export default function PortfolioPage() {
- const [active, setActive] = useState(0);
- const s = sectors[active];
+  const [active, setActive] = useState(0);
+  const s = sectors[active];
+  const [slide, setSlide] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const touchX = useRef(null);
+  const go = (n) => setSlide((n + sectors.length) % sectors.length);
 
+  /* reveal-on-scroll for anything tagged data-reveal */
+  useEffect(() => {
+    const nodes = document.querySelectorAll(".pf [data-reveal]");
+    if (!nodes.length) return undefined;
+    if (!("IntersectionObserver" in window)) {
+      nodes.forEach((el) => el.classList.add("in"));
+      return undefined;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { rootMargin: "0px 0px -12% 0px", threshold: 0.12 },
+    );
+    nodes.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
 
- /* reveal-on-scroll for anything tagged data-reveal */
- useEffect(() => {
-   const nodes = document.querySelectorAll(".pf [data-reveal]");
-   if (!nodes.length) return undefined;
-   if (!("IntersectionObserver" in window)) {
-     nodes.forEach((el) => el.classList.add("in"));
-     return undefined;
-   }
-   const io = new IntersectionObserver(
-     (entries) => {
-       entries.forEach((e) => {
-         if (e.isIntersecting) {
-           e.target.classList.add("in");
-           io.unobserve(e.target);
-         }
-       });
-     },
-     { rootMargin: "0px 0px -12% 0px", threshold: 0.12 },
-   );
-   nodes.forEach((el) => io.observe(el));
-   return () => io.disconnect();
- }, []);
+  return (
+    <div className="pf">
+      <Header />
+      <style dangerouslySetInnerHTML={{ __html: css }} />
 
+      {/* ══ 1 · HERO ══ */}
+      <section className="pf-hero" id="top">
+        <div className="pf-hero-dots" />
+        <div className="pf-hero-orb" />
 
- return (
-   <div className="pf">
-     <Header />
-     <style dangerouslySetInnerHTML={{ __html: css }} />
+        <div className="container pf-hero-in">
+          <div className="pf-hero-grid">
+            <div className="pf-hero-copy">
+              <span className="pf-chip">
+                <span className="pf-chip-dot" />
+                IdeaTown Investments · Portfolio
+              </span>
 
+              <h1 className="pf-h1">
+                <span>Where direct</span>
+                <span>capital meets</span>
+                <span className="pf-shim">operational value.</span>
+              </h1>
 
-     {/* ══ 1 · HERO ══ */}
-     <section className="pf-hero" id="top">
-       <div className="pf-hero-dots" />
-       <div className="pf-hero-orb" />
+              <div className="pf-hero-split">
+                <div className="pf-hero-intro">
+                  <p className="pf-hero-kick">
+                    Multi-Sector Deployment Across Core Global Industries
+                  </p>
+                  <p className="pf-hero-lead">
+                    Our approach is not defined by a single stage, sector, or
+                    business model. We look for opportunities where capital,
+                    experience, and execution can create meaningful long-term
+                    value.
+                  </p>
+                </div>
+                <div className="pf-hero-btns">
+                  <a
+                    href="#sectors"
+                    className="pf-btn-gold"
+                    onClick={() => setActive(slide)}
+                  >
+                    Explore the sectors <span aria-hidden="true">→</span>
+                  </a>
+                  <a href="#markets" className="pf-btn-outline">
+                    Where we operate
+                  </a>
+                </div>
+              </div>
+            </div>
 
+            <div className="pf-hero-media">
+              <div
+                className={`pf-car${paused ? " is-paused" : ""}`}
+                role="region"
+                aria-roledescription="carousel"
+                aria-label="Portfolio sectors"
+                onPointerEnter={(e) =>
+                  e.pointerType === "mouse" && setPaused(true)
+                }
+                onPointerLeave={(e) =>
+                  e.pointerType === "mouse" && setPaused(false)
+                }
+                onFocus={(e) =>
+                  e.target.matches(":focus-visible") && setPaused(true)
+                }
+                onBlur={(e) =>
+                  !e.currentTarget.contains(e.relatedTarget) && setPaused(false)
+                }
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowRight") {
+                    e.preventDefault();
+                    go(slide + 1);
+                  }
+                  if (e.key === "ArrowLeft") {
+                    e.preventDefault();
+                    go(slide - 1);
+                  }
+                }}
+                onTouchStart={(e) => {
+                  touchX.current = e.touches[0].clientX;
+                }}
+                onTouchEnd={(e) => {
+                  if (touchX.current == null) return;
+                  const dx = e.changedTouches[0].clientX - touchX.current;
+                  touchX.current = null;
+                  if (Math.abs(dx) > 40) go(slide + (dx < 0 ? 1 : -1));
+                }}
+              >
+                {sectors.map((sec, i) => {
+                  const m = heroMedia[sec.id];
+                  return (
+                    <figure
+                      key={sec.id}
+                      className={`pf-car-slide${i === slide ? " is-on" : ""}`}
+                      role="group"
+                      aria-roledescription="slide"
+                      aria-label={`${i + 1} of ${sectors.length}: ${sec.name}`}
+                      aria-hidden={i !== slide}
+                    >
+                      <img
+                        src={m.src}
+                        alt={m.alt}
+                        width={m.w}
+                        height={m.h}
+                        loading={i === 0 ? "eager" : "lazy"}
+                        decoding="async"
+                        style={{ objectPosition: m.pos }}
+                      />
+                      <figcaption className="pf-car-cap">
+                        <span className="pf-car-count">
+                          <b>{sec.num}</b> /{" "}
+                          {String(sectors.length).padStart(2, "0")}
+                        </span>
+                        <h3 className="pf-car-name">{sec.name}</h3>
+                        <p className="pf-car-lede">{sec.lede}</p>
+                        <span className="pf-car-mkts">
+                          {sec.markets.map((mk) => (
+                            <span key={mk}>{MARKET_SHORT[mk] || mk}</span>
+                          ))}
+                        </span>
+                      </figcaption>
+                    </figure>
+                  );
+                })}
 
-       <div className="container pf-hero-in">
-         <span className="pf-chip">
-           <span className="pf-chip-dot" />
-           IdeaTown Investments · Portfolio
-         </span>
+                <div className="pf-car-bars">
+                  {sectors.map((sec, i) => (
+                    <button
+                      type="button"
+                      key={sec.id}
+                      className={`pf-car-bar${i < slide ? " is-done" : ""}${i === slide ? " is-on" : ""}`}
+                      aria-label={`Show ${sec.name}`}
+                      aria-current={i === slide ? "true" : undefined}
+                      onClick={() => go(i)}
+                    >
+                      <span
+                        key={i === slide ? `on-${slide}` : "off"}
+                        onAnimationEnd={
+                          i === slide ? () => go(slide + 1) : undefined
+                        }
+                      />
+                    </button>
+                  ))}
+                </div>
 
+                <div className="pf-car-nav">
+                  <button
+                    type="button"
+                    aria-label="Previous sector"
+                    onClick={() => go(slide - 1)}
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M15 18l-6-6 6-6" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Next sector"
+                    onClick={() => go(slide + 1)}
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M9 18l6-6-6-6" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-         <h1 className="pf-h1">
-           <span>Where direct capital</span>
-           <span>
-             meets <span className="pf-shim">operational value.</span>
-           </span>
-         </h1>
+        {/* sector ticker — bridges the light hero into the dark sector section */}
+        <div className="pf-ticker" aria-hidden="true">
+          <div className="pf-ticker-track">
+            {[0, 1].map((row) => (
+              <div className="pf-ticker-row" key={row}>
+                {sectors.map((sec) => (
+                  <span className="pf-ticker-item" key={sec.id}>
+                    {sec.name}
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
+      {/* ══ 2 · SECTORS ══ */}
+      <section className="pf-sec" id="sectors">
+        <div className="container">
+          <div className="pf-sec-head" data-reveal="">
+            <h2 className="pf-sec-title pf-sec-title-d">Portfolio Sectors</h2>
+            <span className="pf-sec-rule pf-sec-rule-d" />
 
-         <div className="pf-hero-split">
-           <p className="pf-hero-kick">
-             Multi-Sector Deployment Across Core Global Industries
-           </p>
-           <p className="pf-hero-lead">
-             Our approach is not defined by a single stage, sector, or business model. We look for opportunities where capital, experience,
-             and execution can create meaningful long-term value. 
-           </p>
-           <div className="pf-hero-btns">
-             <a href="#sectors" className="pf-btn-gold">
-               Explore the sectors <span aria-hidden="true">→</span>
-             </a>
-             <a href="#markets" className="pf-btn-outline">
-               Where we operate
-             </a>
-           </div>
-         </div>
-       </div>
+            <p className="pf-sec-sub pf-sec-sub-d">
+              A diversified footprint built on{" "}
+              <span className="pf-shim-d">real economy assets.</span>
+            </p>
 
+            <p className="pf-sec-lede">
+              Six sectors across three markets. Choose one from the list to see
+              what we fund inside it and how far the operations reach.
+            </p>
+          </div>
 
-       {/* sector ticker — bridges the light hero into the dark sector section */}
-       <div className="pf-ticker" aria-hidden="true">
-         <div className="pf-ticker-track">
-           {[0, 1].map((row) => (
-             <div className="pf-ticker-row" key={row}>
-               {sectors.map((sec) => (
-                 <span className="pf-ticker-item" key={sec.id}>
-                   {sec.name}
-                 </span>
-               ))}
-             </div>
-           ))}
-         </div>
-       </div>
-     </section>
+          <div className="pf-sec-grid">
+            {/* the sector list */}
+            <div
+              className="pf-list"
+              role="tablist"
+              aria-label="Portfolio sectors"
+            >
+              <p className="pf-list-l">Select a sector</p>
 
+              {sectors.map((sec, i) => {
+                const on = i === active;
+                return (
+                  <button
+                    key={sec.id}
+                    type="button"
+                    role="tab"
+                    id={`tab-${sec.id}`}
+                    aria-selected={on}
+                    aria-controls="sector-panel"
+                    className={`pf-row${on ? " on" : ""}`}
+                    onClick={() => setActive(i)}
+                  >
+                    <span className="pf-row-mark">
+                      <Icon name={sec.icon} size={20} />
+                    </span>
+                    <span>
+                      <span className="pf-row-name">{sec.name}</span>
+                      <span className="pf-row-hint">{sec.hint}</span>
+                    </span>
+                    <span className="pf-row-n">{sec.num}</span>
+                  </button>
+                );
+              })}
+            </div>
 
-     {/* ══ 2 · SECTORS ══ */}
-     <section className="pf-sec" id="sectors">
-       <div className="container">
-         <div className="pf-sec-head" data-reveal="">
-           <h2 className="pf-sec-title pf-sec-title-d">Portfolio Sectors</h2>
-           <span className="pf-sec-rule pf-sec-rule-d" />
+            {/* detail panel */}
+            <div
+              className="pf-panel"
+              id="sector-panel"
+              role="tabpanel"
+              aria-labelledby={`tab-${s.id}`}
+              key={s.id}
+            >
+              <div className="pf-panel-top">
+                <span className="pf-panel-mark">
+                  <Icon name={s.icon} size={24} />
+                </span>
+                <span className="pf-panel-n">
+                  Sector {s.num} of {String(sectors.length).padStart(2, "0")}
+                </span>
+              </div>
 
+              <h3 className="pf-panel-name">{s.name}</h3>
+              <p className="pf-panel-lede">{s.lede}</p>
 
-           <p className="pf-sec-sub pf-sec-sub-d">
-             A diversified footprint built on{" "}
-             <span className="pf-shim-d">real economy assets.</span>
-           </p>
+              <p className="pf-label">Portfolio focus</p>
+              <ul className="pf-focus">
+                {s.focus.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
 
+              <p className="pf-label">Operational footprint</p>
+              <p className="pf-foot-text">{s.footprint}</p>
 
-           <p className="pf-sec-lede">
-             Six sectors across three markets. Choose one from the list to see
-             what we fund inside it and how far the operations reach.
-           </p>
-         </div>
+              <div className="pf-panel-mk">
+                {s.markets.map((m) => (
+                  <span key={m}>{m}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-
-         <div className="pf-sec-grid">
-           {/* the sector list */}
-           <div
-             className="pf-list"
-             role="tablist"
-             aria-label="Portfolio sectors"
-           >
-             <p className="pf-list-l">Select a sector</p>
-
-
-             {sectors.map((sec, i) => {
-               const on = i === active;
-               return (
-                 <button
-                   key={sec.id}
-                   type="button"
-                   role="tab"
-                   id={`tab-${sec.id}`}
-                   aria-selected={on}
-                   aria-controls="sector-panel"
-                   className={`pf-row${on ? " on" : ""}`}
-                   onClick={() => setActive(i)}
-                 >
-                   <span className="pf-row-mark">
-                     <Icon name={sec.icon} size={20} />
-                   </span>
-                   <span>
-                     <span className="pf-row-name">{sec.name}</span>
-                     <span className="pf-row-hint">{sec.hint}</span>
-                   </span>
-                   <span className="pf-row-n">{sec.num}</span>
-                 </button>
-               );
-             })}
-           </div>
-
-
-           {/* detail panel */}
-           <div
-             className="pf-panel"
-             id="sector-panel"
-             role="tabpanel"
-             aria-labelledby={`tab-${s.id}`}
-             key={s.id}
-           >
-             <div className="pf-panel-top">
-               <span className="pf-panel-mark">
-                 <Icon name={s.icon} size={24} />
-               </span>
-               <span className="pf-panel-n">
-                 Sector {s.num} of {String(sectors.length).padStart(2, "0")}
-               </span>
-             </div>
-
-
-             <h3 className="pf-panel-name">{s.name}</h3>
-             <p className="pf-panel-lede">{s.lede}</p>
-
-
-             <p className="pf-label">Portfolio focus</p>
-             <ul className="pf-focus">
-               {s.focus.map((item) => (
-                 <li key={item}>{item}</li>
-               ))}
-             </ul>
-
-
-             <p className="pf-label">Operational footprint</p>
-             <p className="pf-foot-text">{s.footprint}</p>
-
-
-             <div className="pf-panel-mk">
-               {s.markets.map((m) => (
-                 <span key={m}>{m}</span>
-               ))}
-             </div>
-           </div>
-         </div>
-       </div>
-     </section>
-
-
-     {/* ══ 3 · GEOGRAPHY ══ */}
-     <section className="pf-geo" id="markets">
-       <div className="container">
-         <div className="pf-geo-head" data-reveal="">
-           <div>
-             <h2 className="pf-sec-title pf-sec-title-l">Where We Operate</h2>
-             <span className="pf-sec-rule pf-sec-rule-l" />
-             <p className="pf-sec-sub pf-sec-sub-l">
-               Three markets, <span className="pf-shim">one thesis.</span>
-             </p>
-           </div>
-           {/* <p className="pf-geo-note">
+      {/* ══ 3 · GEOGRAPHY ══ */}
+      <section className="pf-geo" id="markets">
+        <div className="container">
+          <div className="pf-geo-head" data-reveal="">
+            <div>
+              <h2 className="pf-sec-title pf-sec-title-l">Where We Operate</h2>
+              <span className="pf-sec-rule pf-sec-rule-l" />
+              <p className="pf-sec-sub pf-sec-sub-l">
+                Three markets, <span className="pf-shim">one thesis.</span>
+              </p>
+            </div>
+            {/* <p className="pf-geo-note">
              <Icon name="pin" size={18} />
              Capital, structuring, and operations in the same three places.
            </p> */}
-         </div>
+          </div>
 
+          <div className="pf-geo-map" data-reveal="" data-d="1">
+            <GlobalFootprint />
+          </div>
+        </div>
+      </section>
 
-         <div className="pf-geo-map" data-reveal="" data-d="1">
-           <GlobalFootprint />
-         </div>
-       </div>
-     </section>
+      {/* ══ 4 · CTA ══ */}
+      <section className="pf-cta" id="contact">
+        {[520, 380, 250].map((size) => (
+          <div
+            key={size}
+            className="pf-cta-ring"
+            style={{ width: size, height: size }}
+          />
+        ))}
+        <div className="container pf-cta-in" data-reveal="">
+          <div className="pf-kicker">
+            <span className="pf-chip-dot" />
+            Start the conversation
+          </div>
+          <h2 className="pf-cta-h2">
+            Ready to be <span className="pf-shim-d">part of this?</span>
+          </h2>
+          <p className="pf-cta-sub">
+            No sector filters. Just a real conversation about what you&apos;re
+            building and where it could go.
+          </p>
+          <div className="pf-cta-btns">
+            <Link href="/contact#pitch-form" className="pf-btn-gold">
+              Submit your pitch <span aria-hidden="true">↗</span>
+            </Link>
+            <Link href="/about" className="pf-btn-ghost">
+              About us
+            </Link>
+          </div>
+        </div>
+      </section>
 
-
-     {/* ══ 4 · CTA ══ */}
-     <section className="pf-cta" id="contact">
-       {[520, 380, 250].map((size) => (
-         <div
-           key={size}
-           className="pf-cta-ring"
-           style={{ width: size, height: size }}
-         />
-       ))}
-       <div className="container pf-cta-in" data-reveal="">
-         <div className="pf-kicker">
-           <span className="pf-chip-dot" />
-           Start the conversation
-         </div>
-         <h2 className="pf-cta-h2">
-           Ready to be <span className="pf-shim-d">part of this?</span>
-         </h2>
-         <p className="pf-cta-sub">
-           No sector filters. Just a real conversation about what you&apos;re
-           building and where it could go.
-         </p>
-         <div className="pf-cta-btns">
-           <Link href="/contact#pitch-form" className="pf-btn-gold">
-             Submit your pitch <span aria-hidden="true">↗</span>
-           </Link>
-           <Link href="/about" className="pf-btn-ghost">
-             About us
-           </Link>
-         </div>
-       </div>
-     </section>
-
-
-     <Footer showBanner={false} />
-   </div>
- );
+      <Footer showBanner={false} />
+    </div>
+  );
 }
-
-
-

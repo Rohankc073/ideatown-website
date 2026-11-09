@@ -66,7 +66,7 @@ export default function NewsFrontPage() {
 
   return (
     <section className="nfp">
-      <style suppressHydrationWarning>{nfpStyles}</style>
+      <style dangerouslySetInnerHTML={{ __html: nfpStyles }} />
       <div className="nfp-wrap">
 
         <div className="nfp-masthead">
@@ -207,7 +207,7 @@ export default function NewsFrontPage() {
 const nfpStyles = `
 .nfp {
   background: linear-gradient(180deg, #FFFFFF 0%, #FBFAF6 100%);
-  padding: clamp(56px,8vw,90px) clamp(24px,6vw,80px);
+  padding: clamp(48px,7vw,78px) clamp(24px,6vw,80px);
   position: relative;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }

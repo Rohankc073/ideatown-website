@@ -7,21 +7,38 @@ import { useEffect, useRef, memo } from "react";
    Always a single scrolling line — displayMode "regular" (never
    adaptive, which is what caused the multi-row fallback).
 
-   HEIGHT IS PINNED ON PURPOSE.
-   The tape renders inside an iframe served by TradingView, and they
-   change its internal height from time to time. With no height of
-   our own, this bar — anchored to bottom:0 — could only grow upward
-   when that happened, leaving dead space under the prices. So the
-   wrapper, the containers and the iframe are all locked to --itv-h,
-   and `overflow:hidden` clips whatever padding TradingView adds.
+   ONE VERSION FOR EVERYONE.
+   TradingView serves two different tapes from two hosts:
+     s.tradingview.com          — the classic tape: each item as wide
+                                  as its text, prices in the top part
+                                  of the frame
+     www.tradingview-widget.com — the newer tape: every item a fixed
+                                  324px slot (big gaps), prices centred
+   Their loader picks the newer host but drops back to the classic one
+   when the browser blocks it, so visitors could get either, and the
+   two need different positioning. Setting window.WIDGET_HOST (read by
+   their loader) pins the classic tape for everyone.
 
-   If the prices ever look clipped, raise --itv-h AND the matching
-   body padding-bottom below. Those two numbers must always agree:
-   too small and the bar covers the footer, too large and a gap
-   opens under the page content.
+   CENTRING. The tape lives in TradingView's cross-origin iframe, which
+   they size themselves (58px, Oct 2026). We never force that height:
+   below it the tape switches to a cramped layout. Instead the bar has
+   its own fixed height, and the frame is placed so the middle of the
+   prices (CONTENT_MIDDLE px from the frame's top) lands on the middle
+   of the bar. Whatever falls outside the bar is clipped. If
+   TradingView redesigns the tape and the prices drift off centre,
+   re-measure CONTENT_MIDDLE.
+
+   SIZE: the text and logos can't be restyled across the iframe, so
+   the tape is scaled down by TICKER_SCALE, shrinking text and logos
+   together. BAR_HEIGHT is the bar on screen; the body padding below
+   uses the same number so the bar never covers the footer.
 ════════════════════════════════════════════════════════════════ */
 
-const TICKER_HEIGHT = 46; // px — change here, it feeds both rules below
+const WIDGET_HOST = "https://s.tradingview.com"; // the classic tape (see above)
+const CONTENT_MIDDLE = 22.5; // px from the top of TradingView's frame to the middle of the prices
+const TICKER_SCALE = 0.87; // 1 = TradingView's own size
+const BAR_HEIGHT = 40; // px on screen
+const FRAME_TOP = (BAR_HEIGHT - 1) / 2 - CONTENT_MIDDLE * TICKER_SCALE; // prices on the centre line, below the 1px top border
 
 function TickerTapeWidget() {
   const container = useRef(null);
@@ -33,6 +50,8 @@ function TickerTapeWidget() {
     );
     if (host) host.innerHTML = "";
     if (container.current.querySelector("script")) return;
+
+    window.WIDGET_HOST = WIDGET_HOST;
 
     const script = document.createElement("script");
     script.src =
@@ -77,40 +96,38 @@ function TickerTapeWidget() {
 
   return (
     <div className="itv-wrap">
-      <style suppressHydrationWarning>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .itv-wrap {
-          --itv-h: ${TICKER_HEIGHT}px;
           position: fixed;
           bottom: 0; left: 0; right: 0;
           z-index: 200;
-          height: var(--itv-h);
+          height: ${BAR_HEIGHT}px;
           overflow: hidden;
           background: linear-gradient(180deg, #FFFFFF, #FAF7F0);
           border-top: 1px solid rgba(212,168,75,0.35);
           box-shadow: 0 -6px 24px rgba(20,22,28,0.08);
         }
-        .itv-wrap .tradingview-widget-container,
-        .itv-wrap .tradingview-widget-container__widget {
-          padding: 0;
+        /* Render wider than the bar, then scale down to fit it.
+           TradingView writes an inline width, hence !important. Its
+           inline height is deliberately left alone. */
+        .itv-wrap .tradingview-widget-container {
+          position: absolute;
+          top: ${FRAME_TOP}px;
+          left: 0;
+          width: calc(100% / ${TICKER_SCALE}) !important;
           margin: 0;
-          height: var(--itv-h);
-          overflow: hidden;
+          padding: 0;
+          transform: scale(${TICKER_SCALE});
+          transform-origin: 0 0;
         }
-        /* TradingView writes an inline height onto the iframe, so only
-           !important from a stylesheet can override it. */
-        .itv-wrap iframe {
-          display: block;
-          height: var(--itv-h) !important;
-          min-height: var(--itv-h) !important;
-        }
+        .itv-wrap iframe { display: block; }
         /* The copyright strip lives outside the iframe — hiding it stops
            it adding a second visual row under the tape. */
         .itv-wrap .tradingview-widget-copyright { display: none !important; }
 
-        /* Must match --itv-h, or the bar covers the footer (too small)
-           or a gap opens under the page (too large). */
-        body { padding-bottom: ${TICKER_HEIGHT}px; }
-      `}</style>
+        /* Same height as the bar, so the bar never covers the footer. */
+        body { padding-bottom: ${BAR_HEIGHT}px; }
+      ` }} />
       <div className="tradingview-widget-container" ref={container}>
         <div className="tradingview-widget-container__widget" />
       </div>

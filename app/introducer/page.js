@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import Footer from "@/components/Footer";
 import IndiaTicker from "@/components/India-Ticker";
 
@@ -275,12 +275,12 @@ const STORY_COLS = [
 ];
 
 /* ─────────────────────────────────────────────────────────
-   MARKET DASHBOARD CONFIG — move these to environment
-   variables / a server route before deploying publicly.
+   MARKET DASHBOARD CONFIG — which symbols to show. The keys
+   that used to sit here were dead: the live ones are read
+   from process.env by app/api/{quotes,rates,news}/route.js.
+   This is a "use client" file, so anything defined here
+   ships to the browser. Keep credentials out of it.
 ───────────────────────────────────────────────────────── */
-const FINNHUB_KEY = "d9348shr01qpou39f67gd9348shr01qpou39f680";
-const EXCHANGE_KEY = "438def3da60b09e0dc93b1e3";
-const NEWSAPI_KEY = "ff8ac8a0f09a42da88df8c23eb4b548f";
 
 const TICKERS = [
   { symbol: "JPM", name: "JPMorgan Chase" },
@@ -296,7 +296,7 @@ const REFRESH_MS = 60_000;
 
 /* Hero background image — Dubai skyline at night.
    Save the file as public/assets/hero-dubai-night.jpg */
-const HERO_IMAGE = "/assets/hero-dubai-night.png";
+const HERO_IMAGE = "/assets/hero-dubai-night.jpg";
 
 // const HERO_DEAL_STATS = [
 //   { value: "$500M+", label: "Capital Deployed" },
@@ -408,7 +408,7 @@ function TickerTape() {
 
   return (
     <div className="tape-wrap">
-      <style suppressHydrationWarning>{tapeStyles}</style>
+      <style dangerouslySetInnerHTML={{ __html: tapeStyles }} />
       <div className="tape-label">
         <span className="tape-label-pulse" aria-hidden="true" />
         <Icon name="broadcast" size={14} />
@@ -560,8 +560,8 @@ function NewsFrontPage() {
 
   return (
     <section className="nfp">
-      <style suppressHydrationWarning>{nfpStyles}</style>
-      <div className="itp-wrap">
+      <style dangerouslySetInnerHTML={{ __html: nfpStyles }} />
+      <div className="ip-wrap">
 
         {/* masthead */}
         <div className="nfp-masthead">
@@ -584,7 +584,13 @@ function NewsFrontPage() {
         </div>
         <div className="nfp-rule" aria-hidden="true" />
 
-        {error && <div className="nfp-error">{error}</div>}
+        {/* visitors get a calm note, not the raw API error */}
+        {error && !news.length && (
+          <div className="nfp-error" role="status">
+            <Icon name="news" size={16} />
+            Today&apos;s headlines are refreshing — please check back shortly.
+          </div>
+        )}
 
         {loading && !news.length ? (
           <div className="nfp-layout">
@@ -746,8 +752,8 @@ function NewsFrontPage() {
 
 const nfpStyles = `
 .nfp {
-  background: linear-gradient(180deg, #FFFFFF 0%, #FBFAF6 100%);
-  padding: 68px 0 86px;
+  background: transparent;
+  padding: clamp(56px,7vw,84px) 0 clamp(56px,7vw,84px);
   position: relative;
 }
 .nfp a, .nfp a:link, .nfp a:visited, .nfp a:hover, .nfp a:active {
@@ -760,16 +766,16 @@ const nfpStyles = `
 .nfp-kicker {
   display: inline-flex; align-items: center; gap: 8px;
   font-size: 11px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase;
-  color: #B8862E; margin-bottom: 8px;
+  color: #8A6330; margin-bottom: 8px;
 }
 .nfp-live {
   width: 7px; height: 7px; border-radius: 50%; background: #16A34A;
   box-shadow: 0 0 0 0 rgba(22,163,74,0.5);
   animation: gold-pulse 2s infinite;
 }
-.nfp-title {
-  font-family: var(--itp-serif, serif);
-  color: #14161C; font-size: clamp(26px, 3.4vw, 38px); font-weight: 700;
+.itp .nfp-title {
+  font-family: var(--ip-font);
+  color: #0e1016; font-size: clamp(30px, 3.6vw, 46px); font-weight: 700; letter-spacing: -0.02em;
   letter-spacing: -0.01em; margin: 0;
 }
 .nfp-date {
@@ -783,15 +789,18 @@ const nfpStyles = `
   background: linear-gradient(90deg, #D4A84B 0 120px, rgba(20,22,28,0.08) 120px 100%);
 }
 .nfp-error {
-  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
-  color: #B91C1C; font-size: 13px; padding: 10px 14px; border-radius: 8px;
-  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+  background: #fff; border: 1px dashed rgba(198,161,91,0.45);
+  color: rgba(14,16,22,0.62); font-size: 14px; padding: 22px 20px; border-radius: 14px;
 }
+.nfp-error svg { color: #8A6330; }
 
 .nfp-layout {
   display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; align-items: stretch;
 }
 @media (max-width: 900px) { .nfp-layout { grid-template-columns: 1fr; } }
+@media (max-width: 1024px) { .nfp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .nfp-grid { grid-template-columns: 1fr; } }
 
 /* LEAD */
 .nfp-lead { display: block; }
@@ -821,7 +830,7 @@ const nfpStyles = `
   padding: 5px 12px; border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.35);
 }
 .nfp-lead-title {
-  font-family: var(--itp-serif, serif); color: #ffffff !important;
+  font-family: var(--ip-font); color: #ffffff !important;
   font-size: clamp(21px, 2.5vw, 30px); font-weight: 700; line-height: 1.24; margin: 0 0 12px;
   text-shadow: 0 2px 16px rgba(0,0,0,0.65);
 }
@@ -850,7 +859,7 @@ const nfpStyles = `
 .nfp-rail { display: flex; flex-direction: column; gap: 6px; }
 .nfp-rail-head {
   display: flex; align-items: center; gap: 8px;
-  font-family: var(--itp-serif, serif); color: #14161C; font-size: 16px; font-weight: 600;
+  font-family: var(--ip-font); color: #14161C; font-size: 16px; font-weight: 600;
   padding-bottom: 14px; margin-bottom: 8px; border-bottom: 2px solid #D4A84B;
 }
 .nfp-rail-head i { color: #C89B3F; font-size: 17px; }
@@ -882,7 +891,7 @@ const nfpStyles = `
 
 /* CARD GRID */
 .nfp-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 24px; margin-top: 40px; padding-top: 34px; border-top: 1px solid rgba(20,22,28,0.08);
 }
 .nfp-card {
@@ -981,7 +990,7 @@ const nfpStyles = `
 .nrd-source { color: #B8862E; font-weight: 700; }
 .nrd-edot { color: rgba(184,134,46,0.4); }
 .nrd-title {
-  font-family: var(--itp-serif, serif);
+  font-family: var(--ip-font);
   font-size: clamp(21px, 3vw, 28px); font-weight: 700; line-height: 1.28;
   color: #14161C; margin: 0 0 16px;
 }
@@ -1166,7 +1175,7 @@ function MarketDashboard() {
 
   return (
     <section className="mkt-sec" id="markets">
-      <style suppressHydrationWarning>{mktStyles}</style>
+      <style dangerouslySetInnerHTML={{ __html: mktStyles }} />
 
       <div className="itp-wrap">
         {/* <div className="mkt-head">
@@ -1267,9 +1276,9 @@ function MarketDashboard() {
 }
 
 const mktStyles = `
-.mkt-sec { padding: 80px 0; background: #F7F5EF; position: relative; }
+.mkt-sec { padding: 70px 0; background: #F7F5EF; position: relative; }
 .mkt-head { text-align: center; max-width: 640px; margin: 0 auto 48px; }
-.mkt-head h2 { font-family: var(--itp-serif, serif); color: #14161C; font-size: 32px; margin: 16px 0 12px; }
+.mkt-head h2 { font-family: var(--ip-font); color: #14161C; font-size: 32px; margin: 16px 0 12px; }
 .mkt-head p { color: rgba(20,22,28,0.65); font-size: 15px; line-height: 1.7; }
 .mkt-updated {
   display: inline-flex; align-items: center; gap: 6px; margin-top: 16px;
@@ -1286,7 +1295,7 @@ const mktStyles = `
 .mkt-panel--terminal { border-color: rgba(212,168,75,0.32); box-shadow: 0 2px 14px rgba(20,22,28,0.06); }
 .mkt-panel-title {
   display: flex; align-items: center; gap: 10px; color: #14161C;
-  font-family: var(--itp-serif, serif); font-size: 18px; font-weight: 600; margin-bottom: 20px;
+  font-family: var(--ip-font); font-size: 18px; font-weight: 600; margin-bottom: 20px;
 }
 .mkt-panel-title i { color: #C89B3F; font-size: 20px; }
 .mkt-panel-sub {
@@ -1345,15 +1354,45 @@ const mktStyles = `
 `;
 
 /* ═══════════════════════════════════════════════════════════
-   HERO STYLES — DARK night skyline.
-   · Same slow zoom animation as before.
-   · Deep navy scrim on the left (where the text sits) fading to
-     clear on the right, so the Burj Khalifa and city lights stay
-     vivid while the text always has a dark backdrop.
-   · A soft gold glow behind the headline ties into the sunset.
-   · Text is cream + bright gold for contrast on dark.
+   PAGE STYLES — light cream tint over the left of the night
+   skyline so the copy reads clearly, then calm editorial
+   sections in the site palette (ink · paper · gold).
 ═══════════════════════════════════════════════════════════ */
-const heroStyles = `
+const pageStyles = `
+.ip { --ink:#0e1016; --ink-2:#161922; --paper:#FAF8F3; --paper-2:#F2EEE4; --gold:#C6A15B; --gold-lt:#E8C876; --gold-dk:#8A6330;
+  --line:rgba(14,16,22,.08); --muted:rgba(14,16,22,.62); background:var(--paper);
+  --ip-font:var(--itp-serif),Georgia,serif; font-family:var(--itp-sans),system-ui,sans-serif; }
+.itp .ip :is(h1,h2,h3,h4) { font-family:var(--ip-font); }
+.ip :focus-visible { outline:2px solid var(--gold); outline-offset:3px; border-radius:6px; }
+
+/* ── shared ── */
+.ip-wrap { max-width:1200px; margin:0 auto; padding:0 clamp(20px,5vw,48px); }
+.ip-sec { padding:clamp(62px,7.8vw,96px) 0; position:relative; }
+.ip-eyebrow { display:inline-flex; align-items:center; gap:10px; margin-bottom:16px;
+  font-size:11px; font-weight:800; letter-spacing:.22em; text-transform:uppercase; color:var(--gold-dk); }
+.ip-eyebrow::before { content:""; width:22px; height:1.5px; background:var(--gold); }
+.ip-eyebrow--c { justify-content:center; }
+.ip-eyebrow--light { color:var(--gold-lt); }
+.itp .ip h2.ip-h2 { font-family:var(--ip-font); font-size:clamp(30px,3.6vw,46px); font-weight:700;
+  line-height:1.08; letter-spacing:-.02em; color:var(--ink); margin:0 0 18px; }
+.itp .ip h2.ip-h2 em { font-style:italic; color:var(--gold-dk); }
+.ip .ip-lede { font-size:clamp(15.5px,1.4vw,17px); line-height:1.8; color:var(--muted); max-width:60ch; }
+.ip-head-c { text-align:center; max-width:720px; margin:0 auto clamp(40px,5vw,60px); }
+.ip .ip-head-c .ip-lede { margin:0 auto; }
+
+.ip-btn { display:inline-flex; align-items:center; justify-content:center; gap:10px; min-height:52px;
+  padding:0 28px; border-radius:999px; font-size:14px; font-weight:700; letter-spacing:.02em;
+  text-decoration:none !important; transition:transform .2s, box-shadow .2s, background .2s, border-color .2s, color .2s; }
+.ip-btn-gold { background:linear-gradient(135deg,#C6A15B,#8A6330); color:#fff !important;
+  box-shadow:0 10px 28px rgba(138,99,48,.32); }
+.ip-btn-gold:hover { transform:translateY(-2px); box-shadow:0 16px 36px rgba(138,99,48,.40); }
+.ip-btn-ghost { border:1.5px solid rgba(14,16,22,.18); color:var(--ink) !important; background:rgba(255,255,255,.55);
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+.ip-btn-ghost:hover { border-color:var(--gold); background:#fff; }
+.ip-btn svg { transition:transform .2s; }
+.ip-btn:hover .ip-arrow { transform:translateX(3px); }
+
+/* ═════════ HERO (original introducer hero) ═════════ */
 .nh-hero {
   position: relative; min-height: 92vh; display: flex; align-items: center; overflow: hidden;
   background: #070B14;
@@ -1396,7 +1435,7 @@ const heroStyles = `
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; height: 2px;
   background: linear-gradient(90deg, transparent, rgba(233,205,140,0.85), transparent);
 }
-.nh-hero-inner { position: relative; z-index: 3; padding: 140px 0 110px; width: 100%; }
+.nh-hero-inner { position: relative; z-index: 3; padding-block: 140px 130px; width: 100%; }
 .nh-hero-content { max-width: 760px; }
 
 .nh-badge {
@@ -1431,6 +1470,8 @@ const heroStyles = `
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)) drop-shadow(0 4px 20px rgba(0,0,0,0.45));
   animation: nh-gold-shine 6s ease-in-out infinite;
 }
+/* room for the italic overhang so gradient text isn't clipped */
+.itp .nh-hero .nh-display em { padding-right:.12em; margin-right:-.12em; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
 @keyframes nh-gold-shine { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
 .nh-sub {
@@ -1445,7 +1486,8 @@ const heroStyles = `
   max-width: 56ch; margin: 0 0 28px !important; text-shadow: 0 1px 3px rgba(0,0,0,0.65), 0 2px 16px rgba(0,0,0,0.55);
 }
 .nh-ctas { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-top: 22px; }
-.nh-ctas .itp-btn { box-shadow: 0 10px 34px rgba(0,0,0,0.35), 0 0 0 1px rgba(233,205,140,0.25); }
+.nh-hero .ip-btn-ghost { border-color: rgba(255,255,255,.30); color: #fff !important; background: rgba(255,255,255,.06); }
+.nh-hero .ip-btn-ghost:hover { border-color: #E8C876; background: rgba(255,255,255,.12); }
 
 .nh-stats { display: flex; flex-wrap: wrap; gap: 18px 46px; margin-top: 58px; padding-top: 30px; border-top: 1px solid rgba(246,241,230,0.16); }
 .nh-stat { display: flex; flex-direction: column; }
@@ -1467,7 +1509,7 @@ const heroStyles = `
 @media (max-width: 640px) {
   .nh-hero { min-height: auto; }
   .nh-hero-img { background-position: 60% 55%; }
-  .nh-hero-inner { padding: 76px 24px 60px; }
+  .nh-hero-inner { padding-block: 76px 110px; }
   .nh-hero-content { max-width: 100%; }
   .nh-badge {
     padding: 6px 12px; font-size: 8px; letter-spacing: 0.13em;
@@ -1487,10 +1529,7 @@ const heroStyles = `
     margin-bottom: 24px; max-width: 40ch;
   }
   .nh-ctas { margin-top: 2px; }
-  .nh-ctas .itp-btn {
-    width: auto; justify-content: center;
-    padding: 13px 26px; font-size: 13px; border-radius: 10px;
-  }
+  .nh-ctas .ip-btn { flex: 1 1 100%; }
   .nh-stats {
     gap: 0; margin-top: 30px; padding: 14px 4px; border-radius: 14px;
     background: rgba(10,14,24,0.6); backdrop-filter: blur(8px);
@@ -1511,10 +1550,9 @@ const heroStyles = `
 }
 
 @media (max-width: 400px) {
-  .nh-hero-inner { padding: 68px 20px 52px; }
+  .nh-hero-inner { padding-block: 68px 104px; }
   .itp .nh-hero .nh-display { font-size: 25px; }
   .nh-desc { font-size: 12.5px; margin-bottom: 20px; }
-  .nh-ctas .itp-btn { padding: 12px 22px; font-size: 12.5px; }
   .nh-stat-val { font-size: 14px; }
   .nh-stat-lbl { font-size: 7px; }
   .nh-stat { padding: 0 4px; }
@@ -1523,11 +1561,139 @@ const heroStyles = `
 @media (prefers-reduced-motion: reduce) {
   .nh-hero-img, .itp .nh-hero .nh-display em, .nh-badge-dot, .nh-scroll-line { animation: none !important; }
 }
+
+/* stats strip floats over the bottom of the hero */
+.ip-stats-wrap { position:relative; z-index:3; margin-top:-64px; }
+.ip-stats { display:grid; grid-template-columns:repeat(3,1fr); background:#fff; border-radius:20px;
+  border:1px solid rgba(198,161,91,.22); box-shadow:0 24px 60px rgba(14,16,22,.10); overflow:hidden; }
+.ip-stat { padding:28px 24px; text-align:center; position:relative; }
+.ip-stat + .ip-stat::before { content:""; position:absolute; left:0; top:24px; bottom:24px; width:1px; background:var(--line); }
+/* the serif's 3 and 5 dip below the baseline; the gold gradient only paints inside the box,
+   so pad the box down to cover them (the negative margin keeps the spacing as it was) */
+.ip-stat-num { font-family:var(--ip-font); font-size:clamp(32px,3.4vw,44px); font-weight:700; line-height:1; letter-spacing:-.02em;
+  padding-bottom:.22em; margin-bottom:-.22em;
+  background:linear-gradient(135deg,#C6A15B,#8A6330); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; }
+.ip-stat-lbl { margin-top:10px; font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:rgba(14,16,22,.55); }
+
+/* ═════════ VALUES (split) ═════════ */
+.ip-split { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:clamp(36px,6vw,88px); align-items:start; }
+.ip-split-copy { position:sticky; top:120px; }
+.ip-vlist { display:flex; flex-direction:column; gap:14px; list-style:none; margin:0; padding:0; }
+.ip-vitem { display:flex; gap:18px; padding:24px; background:#fff; border:1px solid var(--line); border-radius:18px;
+  transition:border-color .2s, box-shadow .2s, transform .2s; }
+.ip-vitem:hover { border-color:rgba(198,161,91,.40); box-shadow:0 16px 40px rgba(138,99,48,.10); transform:translateY(-2px); }
+.ip-vicon { width:52px; height:52px; border-radius:14px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+  background:var(--ink); color:var(--gold-lt); box-shadow:0 8px 20px rgba(14,16,22,.18); }
+.itp .ip .ip-vitem h3 { font-family:var(--ip-font); font-size:21px; font-weight:600; letter-spacing:0; color:var(--ink); margin:2px 0 8px; }
+.ip .ip-vitem p { font-size:14.5px; line-height:1.75; color:var(--muted); }
+
+/* ═════════ WHO WE ARE (dark) ═════════ */
+.ip-dark { background:var(--ink); overflow:hidden; }
+.ip-dark::before { content:""; position:absolute; top:-200px; right:-160px; width:560px; height:560px; border-radius:50%;
+  background:radial-gradient(circle,rgba(198,161,91,.16),transparent 65%); pointer-events:none; }
+.itp .ip .ip-dark h2.ip-h2 { color:#F6F1E6; }
+.itp .ip .ip-dark h2.ip-h2 em { color:var(--gold-lt); }
+.ip .ip-dark .ip-lede { color:rgba(246,241,230,.66); }
+.ip-fgrid { position:relative; display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+.ip-fcard { padding:28px 24px; border-radius:18px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09);
+  transition:background .2s, border-color .2s, transform .2s; }
+.ip-fcard:hover { background:rgba(198,161,91,.08); border-color:rgba(198,161,91,.40); transform:translateY(-3px); }
+.ip-fnum { display:block; font-size:11px; font-weight:800; letter-spacing:.16em; color:rgba(232,200,118,.6); margin-bottom:18px; }
+.ip-ficon { width:48px; height:48px; border-radius:13px; display:flex; align-items:center; justify-content:center;
+  background:rgba(198,161,91,.12); border:1px solid rgba(198,161,91,.30); color:var(--gold-lt); margin-bottom:20px; }
+.itp .ip .ip-fcard h3 { font-family:var(--ip-font); font-size:19px; font-weight:600; letter-spacing:0; color:#F6F1E6; margin:0 0 10px; }
+.ip .ip-fcard p { font-size:14px; line-height:1.7; color:rgba(246,241,230,.60); }
+
+/* ═════════ PROCESS ═════════ */
+.ip-steps { position:relative; display:grid; grid-template-columns:repeat(4,1fr); gap:20px; list-style:none; margin:0; padding:0; }
+.ip-steps::before { content:""; position:absolute; top:31px; left:12.5%; right:12.5%; height:2px;
+  background:repeating-linear-gradient(90deg,rgba(198,161,91,.55) 0 8px,transparent 8px 14px); }
+.ip-step { position:relative; text-align:center; padding:0 8px; }
+.ip-step-n { position:relative; z-index:1; width:64px; height:64px; margin:0 auto 22px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; background:#fff; border:2px solid var(--gold);
+  font-family:var(--ip-font); font-size:24px; font-weight:700; color:var(--gold-dk);
+  box-shadow:0 0 0 8px var(--paper), 0 10px 24px rgba(138,99,48,.16); transition:background .2s, color .2s; }
+.ip-step:hover .ip-step-n { background:var(--gold); color:#fff; }
+.itp .ip .ip-step h3 { font-family:var(--ip-font); font-size:19px; font-weight:600; letter-spacing:0; color:var(--ink); margin:0 0 10px; }
+.ip .ip-step p { font-size:14px; line-height:1.7; color:var(--muted); max-width:24ch; margin:0 auto; }
+
+/* ═════════ WHY (flow) ═════════ */
+.ip-why { background:var(--paper-2); border-top:1px solid rgba(198,161,91,.18); }
+.ip-flow { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; align-items:stretch; gap:14px; }
+.ip-flow-card { padding:32px 28px; background:#fff; border:1px solid var(--line); border-radius:20px; box-shadow:0 10px 30px rgba(14,16,22,.05); }
+.ip-flow-card--mid { background:var(--ink); border-color:var(--ink); }
+.ip-flow-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; }
+.ip-flow-icon { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+  background:rgba(198,161,91,.12); color:var(--gold-dk); }
+.ip-flow-card--mid .ip-flow-icon { background:rgba(198,161,91,.16); color:var(--gold-lt); }
+.ip-flow-step { font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:rgba(14,16,22,.38); }
+.ip-flow-card--mid .ip-flow-step { color:rgba(232,200,118,.6); }
+.itp .ip .ip-flow-card h3 { font-family:var(--ip-font); font-size:22px; font-weight:600; letter-spacing:0; color:var(--ink); margin:0 0 12px; }
+.itp .ip .ip-flow-card--mid h3 { color:#F6F1E6; }
+.ip .ip-flow-card p { font-size:14.5px; line-height:1.8; color:var(--muted); }
+.ip .ip-flow-card--mid p { color:rgba(246,241,230,.66); }
+.ip-flow-arrow { align-self:center; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  background:#fff; border:1px solid rgba(198,161,91,.40); color:var(--gold-dk); }
+
+/* ═════════ CLOSING CTA ═════════ */
+.ip-cta { position:relative; overflow:hidden; border-radius:28px; padding:clamp(48px,7vw,84px) clamp(28px,6vw,80px);
+  background:#0b0f19; display:grid; grid-template-columns:minmax(0,1.3fr) auto; gap:32px; align-items:center; }
+.ip-cta-img { position:absolute; inset:0; background-size:cover; background-position:30% 55%; opacity:.9; }
+.ip-cta-shade { position:absolute; inset:0; background:linear-gradient(90deg,rgba(11,15,25,.97) 0%,rgba(11,15,25,.86) 42%,rgba(11,15,25,.35) 100%); }
+.ip-cta > *:not(.ip-cta-img):not(.ip-cta-shade) { position:relative; z-index:1; }
+.itp .ip .ip-cta h2.ip-h2 { color:#F6F1E6; margin-bottom:14px; }
+.itp .ip .ip-cta h2.ip-h2 em { color:var(--gold-lt); }
+.ip .ip-cta p { font-size:16px; line-height:1.8; color:rgba(246,241,230,.72); max-width:58ch; }
+
+/* ═════════ RESPONSIVE ═════════ */
+@media (max-width:1024px) {
+  .ip-fgrid { grid-template-columns:1fr 1fr; }
+  .ip-flow { grid-template-columns:1fr; }
+  .ip-flow-arrow { transform:rotate(90deg); justify-self:center; }
+}
+@media (max-width:900px) {
+  .ip-split { grid-template-columns:1fr; }
+  .ip-split-copy { position:static; }
+  .ip-steps { grid-template-columns:1fr 1fr; row-gap:40px; }
+  .ip-steps::before { display:none; }
+  .ip-cta { grid-template-columns:1fr; }
+}
+@media (max-width:760px) {
+  .ip-stats { border-radius:16px; }
+  .ip-stat { padding:18px 6px; }
+  .ip-stat + .ip-stat::before { top:16px; bottom:16px; }
+  .ip-stat-num { font-size:26px; }
+  .ip-stat-lbl { font-size:8.5px; letter-spacing:.08em; line-height:1.35; margin-top:7px; }
+  .ip-fgrid { grid-template-columns:1fr; }
+  .ip-vitem { padding:20px; gap:14px; }
+  .ip-vicon { width:44px; height:44px; }
+  .ip-cta { border-radius:22px; }
+  .ip-cta .ip-btn { width:100%; }
+}
+@media (max-width:640px) {
+  /* phones: one column, with a gold arrow leading to the next step */
+  .ip-steps { grid-template-columns:1fr; row-gap:0; }
+  .ip-step:not(:last-child)::after { content:""; display:block; width:36px; height:36px; margin:20px auto 24px;
+    border-radius:50%; border:1px solid rgba(198,161,91,.45); box-shadow:0 6px 16px rgba(14,16,22,.06);
+    background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A6330' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 5v14M6 13l6 6 6-6'/%3E%3C/svg%3E") center / 15px no-repeat; }
+}
 `;
 
-export default function IntermediaryLanding() {
-  const revealRef = useRef(null);
+const HERO_STATS = [
+  { num: "50+", label: "Active Mandates Reviewed" },
+  { num: "100%", label: "Confidential Review" },
+  { num: "300+", label: "Opportunities Sourced" },
+];
 
+const ArrowRight = (
+  <svg className="ip-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M5 12h14M13 6l6 6-6 6" />
+  </svg>
+);
+
+const APPLY_HREF = "/introducer/application";
+
+export default function IntermediaryLanding() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add("itp-visible")),
@@ -1538,25 +1704,25 @@ export default function IntermediaryLanding() {
   }, []);
 
   return (
-    <div className="itp" ref={revealRef}>
-      <style suppressHydrationWarning>{heroStyles}</style>
+    <div className="ip">
+      <style dangerouslySetInnerHTML={{ __html: pageStyles }} />
 
-      <IndiaTicker  />
+      <IndiaTicker />
 
       {/* ── HERO ── */}
-      <section className="nh-hero">
+      <section className="nh-hero" aria-labelledby="ip-hero-title">
         <div className="nh-hero-img" style={{ backgroundImage: `url(${HERO_IMAGE})` }} aria-hidden="true" />
         <div className="nh-hero-shade" aria-hidden="true" />
         <div className="nh-hero-gold-edge" aria-hidden="true" />
 
-        <div className="itp-wrap nh-hero-inner">
+        <div className="ip-wrap nh-hero-inner">
           <div className="nh-hero-content">
             <div className="nh-badge">
               <span className="nh-badge-dot" aria-hidden="true" />
               IdeaTown Premier Introducer Program
             </div>
 
-            <h1 className="nh-display">
+            <h1 className="nh-display" id="ip-hero-title">
               Become a <em>Premier Introducer</em>
             </h1>
 
@@ -1569,133 +1735,129 @@ export default function IntermediaryLanding() {
             </p>
 
             <div className="nh-ctas">
-              <Link className="itp-btn itp-gold itp-btn-lg itp-btn-glow" href="/mediator/application">
+              <Link className="ip-btn ip-btn-gold" href={APPLY_HREF}>
                 <Icon name="send" size={17} />
                 Submit an Opportunity
               </Link>
+              <a className="ip-btn ip-btn-ghost" href="#process">
+                How it works {ArrowRight}
+              </a>
             </div>
-
-            {/* <div className="nh-stats">
-              {HERO_DEAL_STATS.map((s) => (
-                <div className="nh-stat" key={s.label}>
-                  <span className="nh-stat-val">{s.value}</span>
-                  <span className="nh-stat-lbl">{s.label}</span>
-                </div>
-              ))}
-            </div> */}
           </div>
         </div>
-
-        
       </section>
+
+      {/* ── STATS ── */}
+      <div className="ip-wrap ip-stats-wrap">
+        <div className="ip-stats">
+          {HERO_STATS.map(({ num, label }) => (
+            <div className="ip-stat" key={label}>
+              <div className="ip-stat-num">{num}</div>
+              <div className="ip-stat-lbl">{label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* ── NEWS FRONT PAGE ── */}
       <NewsFrontPage />
 
-      {/* ── STATS ── */}
-      <section className="itp-sec" style={{ paddingTop: "40px", paddingBottom: "40px" }}>
-        <div className="itp-wrap">
-          <div className="itp-stats-row itp-reveal">
-            {[
-              { num: "50+",  label: "Active Mandates Reviewed" },
-              { num: "100%", label: "Confidential Review" },
-              { num: "300+", label: "Opportunities Sourced" }
-            ].map(({ num, label }) => (
-              <div className="itp-stat-cell" key={label}>
-                <div className="itp-stat-num">{num}</div>
-                <div className="itp-stat-lbl">{label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── WHERE MANDATES MEET CAPITAL ── */}
-      <section className="itp-sec itp-band">
-        <div className="itp-wrap">
-          <div className="itp-sec-head itp-reveal">
-            <div className="itp-srule" />
-            <h2>Where Strong Mandates Meet Active Capital</h2>
-            <p>
+      <section className="ip-sec">
+        <div className="ip-wrap ip-split">
+          <div className="ip-split-copy itp-reveal">
+            <span className="ip-eyebrow">Our Commitment</span>
+            <h2 className="ip-h2">
+              Where Strong Mandates Meet <em>Active Capital</em>
+            </h2>
+            <p className="ip-lede">
               Successful transactions are built on strong opportunities, trusted intermediaries, and
               access to the right capital. We provide disciplined evaluation, timely decision-making,
               and a long-term investment perspective.
             </p>
           </div>
-          <div className="itp-vcards">
+          <ul className="ip-vlist">
             {VALUES.map(({ icon, title, desc }, i) => (
-              <div className={`itp-vcard itp-reveal itp-reveal-d${i + 1}`} key={title}>
-                <div className="itp-vcard-icon"><Icon name={icon} color={GOLD} /></div>
-                <h4>{title}</h4>
-                <p>{desc}</p>
-              </div>
+              <li className={`ip-vitem itp-reveal itp-reveal-d${i + 1}`} key={title}>
+                <span className="ip-vicon"><Icon name={icon} size={24} /></span>
+                <div>
+                  <h3>{title}</h3>
+                  <p>{desc}</p>
+                </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
 
       {/* ── WHO WE ARE ── */}
-      <section className="itp-sec" id="who">
-        <div className="itp-wrap">
-          <div className="itp-sec-head itp-reveal">
-            <div className="itp-srule" />
-            <h2>Who We Are</h2>
-            <p>
+      <section className="ip-sec ip-dark" id="who">
+        <div className="ip-wrap">
+          <div className="ip-head-c itp-reveal">
+            <span className="ip-eyebrow ip-eyebrow--c ip-eyebrow--light">What We Invest In</span>
+            <h2 className="ip-h2">Who <em>We Are</em></h2>
+            <p className="ip-lede">
               IdeaTown is a direct investment company focused on deploying capital into qualified
               opportunities across industries. Our investment philosophy centers on value
               creation, strategic growth, and long-term return on investment.
             </p>
           </div>
-          <div className="itp-fcards">
+          <div className="ip-fgrid">
             {FOCUS.map(({ icon, title, desc }, i) => (
-              <div className={`itp-fcard itp-reveal itp-reveal-d${i + 1}`} key={title}>
-                <div className="itp-fcard-icon"><Icon name={icon} color={GOLD} /></div>
-                <h4>{title}</h4>
+              <article className={`ip-fcard itp-reveal itp-reveal-d${i + 1}`} key={title}>
+                <span className="ip-fnum">{String(i + 1).padStart(2, "0")}</span>
+                <span className="ip-ficon"><Icon name={icon} size={24} /></span>
+                <h3>{title}</h3>
                 <p>{desc}</p>
-              </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
       {/* ── PROCESS ── */}
-      <section className="itp-sec">
-        <div className="itp-wrap">
-          <div className="itp-sec-head itp-reveal">
-            <div className="itp-srule" />
-            <h2>How our Premier Introducer works</h2>
-            <p>A transparent, efficient process from first contact to capital deployment.</p>
+      <section className="ip-sec" id="process">
+        <div className="ip-wrap">
+          <div className="ip-head-c itp-reveal">
+            <span className="ip-eyebrow ip-eyebrow--c">The Process</span>
+            <h2 className="ip-h2">How our Premier Introducer <em>works</em></h2>
+            <p className="ip-lede">A transparent, efficient process from first contact to capital deployment.</p>
           </div>
-          <div className="itp-process-row itp-reveal">
+          <ol className="ip-steps itp-reveal">
             {PROCESS.map(({ n, title, desc }) => (
-              <div className="itp-proc-item" key={n}>
-                <div className="itp-proc-num">{n}</div>
-                <h4>{title}</h4>
+              <li className="ip-step" key={n}>
+                <div className="ip-step-n">{n}</div>
+                <h3>{title}</h3>
                 <p>{desc}</p>
-              </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
       {/* ── WHY IDEATOWN ── */}
-      <section className="itp-sec itp-band">
-        <div className="itp-wrap">
-          <div className="itp-story-band itp-reveal">
-            <div className="itp-srule" style={{ margin: "0 auto 24px" }} />
-            <h2 className="itp-story-heading">Why Work With IdeaTown</h2>
-            <div className="itp-story-cols">
-              {STORY_COLS.map(({ icon, heading, body }, i) => (
-                <div className={`itp-story-col itp-reveal itp-reveal-d${i + 1}`} key={heading}>
-                  {i > 0 && <div className="itp-story-sep" aria-hidden="true" />}
-                  <div className="itp-story-icon">
-                    <Icon name={icon} size={28} color={GOLD} style={{ display: "block" }} />
+      <section className="ip-sec ip-why">
+        <div className="ip-wrap">
+          <div className="ip-head-c itp-reveal">
+            <span className="ip-eyebrow ip-eyebrow--c">The Partnership</span>
+            <h2 className="ip-h2">Why Work With <em>IdeaTown</em></h2>
+          </div>
+          <div className="ip-flow">
+            {STORY_COLS.map(({ icon, heading, body }, i) => (
+              <Fragment key={heading}>
+                {i > 0 && (
+                  <span className="ip-flow-arrow" aria-hidden="true">{ArrowRight}</span>
+                )}
+                <article className={`ip-flow-card${i === 1 ? " ip-flow-card--mid" : ""} itp-reveal itp-reveal-d${i + 1}`}>
+                  <div className="ip-flow-top">
+                    <span className="ip-flow-icon"><Icon name={icon} size={26} /></span>
+                    <span className="ip-flow-step">Step {String(i + 1).padStart(2, "0")}</span>
                   </div>
-                  <h4 className="itp-story-col-heading" style={{ color: "#14161C", fontFamily: "var(--itp-serif)", fontSize: "20px", fontWeight: 600, marginBottom: "14px" }}>{heading}</h4>
-                  <p className="itp-story-col-body" style={{ color: "rgba(20,22,28,0.72)", fontSize: "14.5px", lineHeight: 1.85 }}>{body}</p>
-                </div>
-              ))}
-            </div>
+                  <h3>{heading}</h3>
+                  <p>{body}</p>
+                </article>
+              </Fragment>
+            ))}
           </div>
         </div>
       </section>
@@ -1703,39 +1865,36 @@ export default function IntermediaryLanding() {
       {/* ── MARKETS DESK ──
            Disabled. Every panel inside MarketDashboard (Equity Watchlist,
            Currency Desk, TradingHours) is commented out, so it rendered an
-           empty band 200px tall — 80px padding top + bottom plus the 40px
-           margin under .mkt-desk — which was the big gap above this CTA.
-
-           Leaving it unmounted also stops its Finnhub / exchange-rate
-           fetches, which were still firing on every page load for data
-           nobody could see.
-
-           To bring it back: uncomment the line below AND uncomment the
-           panels inside MarketDashboard — otherwise the empty band returns.
+           empty band. Leaving it unmounted also stops its Finnhub /
+           exchange-rate fetches. To bring it back: uncomment the line below
+           AND uncomment the panels inside MarketDashboard.
       <MarketDashboard />
       */}
 
       {/* ── CLOSING CTA ── */}
-      <section className="itp-sec">
-        <div className="itp-wrap">
-          <div className="itp-closing-v2 itp-reveal">
-            <h2>Submit an Opportunity</h2>
-            <p>
-              If you are currently advising on active mandates or representing businesses seeking
-              capital, acquisitions, strategic expansion, or exit opportunities — we welcome the
-              opportunity to review them.
-            </p>
-            <div className="itp-closing-v2-ctas">
-              <Link className="itp-btn itp-gold itp-btn-lg" href="/mediator/application">
-                <Icon name="send" size={17} />
-                Connect With IdeaTown
-              </Link>
+      <section className="ip-sec">
+        <div className="ip-wrap">
+          <div className="ip-cta itp-reveal">
+            <div className="ip-cta-img" style={{ backgroundImage: `url(${HERO_IMAGE})` }} aria-hidden="true" />
+            <div className="ip-cta-shade" aria-hidden="true" />
+            <div>
+              <span className="ip-eyebrow ip-eyebrow--light">Ready When You Are</span>
+              <h2 className="ip-h2">Submit an <em>Opportunity</em></h2>
+              <p>
+                If you are currently advising on active mandates or representing businesses seeking
+                capital, acquisitions, strategic expansion, or exit opportunities — we welcome the
+                opportunity to review them.
+              </p>
             </div>
+            <Link className="ip-btn ip-btn-gold" href={APPLY_HREF}>
+              <Icon name="send" size={17} />
+              Connect With IdeaTown
+            </Link>
           </div>
         </div>
       </section>
 
-      <Footer showBanner={false}/>
+      <Footer showBanner={false} />
     </div>
   );
 }

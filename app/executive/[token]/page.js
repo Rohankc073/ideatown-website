@@ -1,6 +1,11 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  FormLinkChecking,
+  FormLinkUsed,
+  useFormLinkStatus,
+} from "@/components/FormLinkGate";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Footer from "@/components/Footer";
@@ -31,14 +36,14 @@ const FILE_CATEGORIES = [
 ];
 
 /* ── UPLOAD LIMITS ──
-   25MB per file, 100MB for everything in one submission. The live server
-   (Nginx on ideatowninvestments.com) accepts up to 150MB per request, so a
-   full 100MB submission always gets through. The browser checks these
+   25MB per file, 95MB for everything in one submission. The combined cap
+   stays under 100MB so the whole request (files plus form text and multipart
+   overhead) fits a 100MB server/proxy limit. The browser checks these
    limits the moment a file is picked, so an oversized file never reaches
    the Submit button. */
 const FILE_LIMITS = {
   maxFileMB: 25,          // per single file
-  maxTotalMB: 100,        // all attachments combined
+  maxTotalMB: 95,         // all attachments combined
   maxAdditionalFiles: 10, // "Additional documents" count
 };
 const MB = 1024 * 1024;
@@ -1192,7 +1197,7 @@ function TitleCard() {
   );
 }
 
-export default function ExecutiveLandingPage() {
+function ExecutiveLandingPage() {
   const [step, setStep] = useState(0);
   const [maxReached, setMaxReached] = useState(0);
   const [errors, setErrors] = useState({});
@@ -1236,6 +1241,10 @@ export default function ExecutiveLandingPage() {
   useEffect(() => {
     if (rotated.current) return; // guard against StrictMode's double-invoke
     rotated.current = true;
+    // A token the CRM minted and put in a Form B link identifies the lead it
+    // was sent to, so the application can attach itself. Minting a fresh one
+    // here would throw that away — keep whatever arrived in the URL.
+    if (urlToken && urlToken !== "demo") return;
     refreshToken();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -1568,7 +1577,7 @@ export default function ExecutiveLandingPage() {
   return (
     <>
       <div className="ep-page">
-        <style suppressHydrationWarning>{execStyles}</style>
+        <style dangerouslySetInnerHTML={{ __html: execStyles }} />
 
         {/* ── TOPBAR ── */}
         <div className="ep-topbar">
@@ -2041,6 +2050,8 @@ html, body { max-width: 100%; overflow-x: clip; }
   -webkit-background-clip: text; background-clip: text; color: transparent;
   animation: ep-title-shine 6s ease-in-out infinite;
 }
+/* room for the italic overhang so gradient text isn't clipped */
+.ep-hero-title em { padding-right:.12em; margin-right:-.12em; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
 @keyframes ep-title-shine { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 .ep-hero-title em::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: 4px; height: 9px; z-index: -1;
@@ -2758,6 +2769,22 @@ html, body { max-width: 100%; overflow-x: clip; }
   .ep-page .ep-cc-trigger { padding: 0 8px; gap: 5px; font-size: 12.5px; }
 }
 
+/* ── touch & iOS polish ──
+   iOS Safari zooms into any focused control under 16px, so every
+   real input/select is pinned to 16px on phones. Choice pills get a
+   44px tap target, and the sticky rail drops its duplicate
+   "current step" line — the active pill already says it. */
+@media (max-width: 640px) {
+  .ep-rail-top { display: none; }
+  .ep-rail { padding-top: 8px; }
+  .ep-page .ep-radio-pill { min-height: 44px; }
+  .ep-page .ep-combo-select,
+  .ep-page .ep-combo-select-currency,
+  .ep-page .ep-field select,
+  .ep-id-card input { font-size: 16px !important; }
+  .ep-page .ep-cc-trigger { min-height: 48px; }
+}
+
 /* ── upload progress ── */
 .up-progress {
   margin: 0 0 18px; padding: 16px 18px 15px; border-radius: 12px;
@@ -2801,3 +2828,17 @@ html, body { max-width: 100%; overflow-x: clip; }
   .ep-card-flourish path { stroke-dashoffset: 0 !important; }
 }
 `;
+
+/**
+ * A used link must not open the form again. The token belongs to one lead and
+ * one application; a second submission on it is refused by the CRM anyway, so
+ * showing a blank form would only let someone fill it in for nothing.
+ */
+export default function ExecutivePageGate(props) {
+  const { token } = useParams();
+  const status = useFormLinkStatus(token);
+
+  if (status === "checking") return <FormLinkChecking />;
+  if (status === "used") return <FormLinkUsed />;
+  return <ExecutiveLandingPage {...props} />;
+}

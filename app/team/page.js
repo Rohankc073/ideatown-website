@@ -166,9 +166,13 @@ const css = `
   .ba-em { font-family:var(--serif); font-style:italic; font-weight:600; letter-spacing:-.008em;
     background:linear-gradient(105deg,#b8863b,#f0dda0 46%,#c6a15b);
     -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+/* room for the italic overhang so gradient text isn't clipped */
+.ba-em { padding-right:.12em; margin-right:-.12em; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
   .ba-em-l { font-family:var(--serif); font-style:italic; font-weight:600; letter-spacing:-.008em;
     background:linear-gradient(105deg,#8b5e1a,#b8863b 42%,#d9ab55 62%,#8b5e1a);
     -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+/* room for the italic overhang so gradient text isn't clipped */
+.ba-em-l { padding-right:.12em; margin-right:-.12em; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
   .ba-eyebrow { display:inline-flex; align-items:center; gap:12px;
     font-size:10.5px; font-weight:700; letter-spacing:.24em; text-transform:uppercase;
     color:var(--gold-deep); }
@@ -230,9 +234,9 @@ const css = `
   .ba-ticker::after { right:0; background:linear-gradient(270deg,#FAF8F3,transparent); }
 
   /* ═══════════ 2 · DIRECTORIES ═══════════ */
-  .ba-dir { padding:clamp(72px,9vw,112px) 0;
+  .ba-dir { padding:clamp(62px,7.8vw,96px) 0;
     background:linear-gradient(180deg,var(--bg-soft) 0%,#FCFBF7 42%,var(--bg) 100%); }
-  .ba-dir-2 { position:relative; padding:clamp(60px,7.5vw,96px) 0 clamp(72px,9vw,112px);
+  .ba-dir-2 { position:relative; padding:clamp(52px,6.5vw,84px) 0 clamp(62px,7.8vw,96px);
     background:var(--bg); border-top:1px solid var(--border); }
   .ba-dir-head { display:flex; align-items:flex-end; justify-content:space-between; gap:26px 40px;
     flex-wrap:wrap; margin-bottom:clamp(34px,4.5vw,54px); }
@@ -329,7 +333,7 @@ const css = `
   .ba-panel-actions { margin-top:36px; display:flex; gap:12px; flex-wrap:wrap; }
 
   /* ═══════════ 4 · CTA ═══════════ */
-  .ba-cta { position:relative; overflow:hidden; text-align:center; padding:clamp(84px,11vw,124px) 0;
+  .ba-cta { position:relative; overflow:hidden; text-align:center; padding:clamp(72px,9.5vw,108px) 0;
     background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(198,161,91,.24),transparent 62%),
       linear-gradient(180deg,var(--ink-2),#070A0E); }
   .ba-cta-ring { position:absolute; top:50%; left:50%; border-radius:50%;

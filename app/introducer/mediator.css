@@ -406,6 +406,8 @@
   background-clip: text;
   animation: itp-shimmer 4.5s linear infinite;
 }
+/* room for the italic overhang so gradient text isn't clipped */
+.itp-hero-display em { padding-right:.12em; margin-right:-.12em; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
 
 /* Subtitle */
 .itp-hero-v2-sub {

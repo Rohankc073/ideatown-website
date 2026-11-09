@@ -39,6 +39,8 @@ const css = `
    background-size:300% auto; animation:hpShim 4.5s linear infinite;
    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
  }
+/* room for the italic overhang so gradient text isn't clipped */
+.hp-shim { padding-right:.12em; margin-right:-.12em; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
 
 
  /* ── section heading scale ──
@@ -74,9 +76,56 @@ const css = `
  .hp-lede-light { color:rgba(14,16,22,.62); }
 
 
+ /* ═══ 0 · FIND YOUR NEXT STEP ═══ */
+ .hp-ns { background:var(--paper); padding:clamp(60px,7.5vw,90px) clamp(20px,6vw,80px); position:relative; overflow:hidden; }
+ .hp-ns-glow { position:absolute; top:-220px; right:-160px; width:560px; height:560px; border-radius:50%; background:radial-gradient(circle,rgba(198,161,91,.14),transparent 66%); pointer-events:none; }
+ .hp-ns-inner { position:relative; z-index:1; }
+ .hp-ns-head { max-width:760px; margin-bottom:clamp(36px,4.6vw,56px); }
+ .hp-ns-lede { font-size:clamp(15.5px,1.4vw,17px); font-weight:400; line-height:1.7; color:rgba(14,16,22,.66); margin:20px 0 0; max-width:62ch; }
+ .hp-ns-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:clamp(16px,2vw,22px); }
+
+ .hp-ns-card {
+   position:relative; background:#fff; border:1px solid rgba(14,16,22,.07); border-radius:20px;
+   padding:clamp(28px,3.2vw,40px); display:flex; flex-direction:column; min-width:0; overflow:hidden;
+   transition:transform .26s, box-shadow .26s, border-color .26s;
+ }
+ .hp-ns-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--gold),rgba(198,161,91,.10)); opacity:0; transition:opacity .26s; }
+ .hp-ns-card:hover { transform:translateY(-5px); border-color:rgba(198,161,91,.42); box-shadow:0 20px 44px rgba(138,99,48,.14); }
+ .hp-ns-card:hover::before, .hp-ns-card:focus-within::before { opacity:1; }
+
+ .hp-ns-top { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:24px; }
+ .hp-ns-icon {
+   width:52px; height:52px; border-radius:15px; flex-shrink:0;
+   background:#0e1016; color:var(--gold-lt);
+   display:flex; align-items:center; justify-content:center;
+   box-shadow:0 8px 20px rgba(14,16,22,.20);
+ }
+ .hp-ns-icon svg { width:24px; height:24px; }
+ .hp-ns-tag { font-size:10px; font-weight:800; letter-spacing:.22em; text-transform:uppercase; color:#8a6a30; text-align:right; }
+ .hp-ns-tag b { color:rgba(14,16,22,.24); font-weight:800; margin-right:8px; }
+
+ .hp-ns-title { font-size:clamp(20px,1.9vw,24px); font-weight:800; color:#0e1016; letter-spacing:-.022em; line-height:1.22; margin:0 0 14px; }
+ .hp-ns-text { font-size:14.5px; font-weight:400; line-height:1.75; color:rgba(14,16,22,.66); margin:0 0 28px; max-width:56ch; }
+
+ .hp-ns-cta {
+   margin-top:auto; align-self:flex-start;
+   display:inline-flex; align-items:center; gap:10px; min-height:46px; padding:13px 22px;
+   border-radius:9px; border:1.5px solid rgba(14,16,22,.85); background:transparent; color:#0e1016;
+   font-size:11px; font-weight:800; letter-spacing:.10em; text-transform:uppercase; text-decoration:none;
+   transition:background .18s, color .18s, border-color .18s, transform .16s;
+ }
+ .hp-ns-cta span { transition:transform .2s; }
+ .hp-ns-cta:hover { background:#0e1016; color:#fff; transform:translateY(-1px); }
+ .hp-ns-cta:hover span { transform:translateX(4px); color:var(--gold-lt); }
+ .hp-ns-cta:focus-visible { outline:3px solid rgba(198,161,91,.55); outline-offset:3px; }
+ .hp-ns-card-lead .hp-ns-cta { background:linear-gradient(135deg,#C6A15B,#8A6330); border-color:transparent; color:#fff; box-shadow:0 8px 22px rgba(198,161,91,.28); }
+ .hp-ns-card-lead .hp-ns-cta:hover { background:linear-gradient(135deg,#d0ac66,#946c37); box-shadow:0 12px 30px rgba(198,161,91,.40); }
+ .hp-ns-card-lead .hp-ns-cta:hover span { color:#fff; }
+
+
  /* ═══ 1 · KEY METRICS ═══ */
  .hp-sig {
-   padding:clamp(56px,8vw,92px) clamp(20px,6vw,80px); position:relative; overflow:hidden;
+   padding:clamp(48px,7vw,80px) clamp(20px,6vw,80px); position:relative; overflow:hidden;
    background:#08090d; border-bottom:1px solid rgba(198,161,91,.10);
  }
  .hp-sig-blob { position:absolute; top:-160px; left:-100px; width:560px; height:560px; border-radius:50%; background:radial-gradient(circle,rgba(198,161,91,.16) 0%,transparent 66%); pointer-events:none; animation:hpOrb 22s ease-in-out infinite; }
@@ -113,7 +162,7 @@ const css = `
 
 
  /* ═══ 2 · MISSION & VISION ═══ */
- .hp-mv { background:var(--paper); padding:clamp(68px,8.5vw,104px) clamp(20px,6vw,80px); }
+ .hp-mv { background:var(--paper); padding:clamp(60px,7.5vw,90px) clamp(20px,6vw,80px); }
  .hp-mv-head { margin-bottom:clamp(32px,4vw,48px); }
  .hp-mv-inner { display:grid; grid-template-columns:330px 1fr; gap:clamp(32px,5vw,72px); align-items:start; }
 
@@ -150,7 +199,7 @@ const css = `
 
 
  /* ═══ 3 · INVESTMENT THESIS ═══ */
- .hp-th { background:#08090d; border-top:1px solid rgba(198,161,91,.10); border-bottom:1px solid rgba(198,161,91,.10); padding:clamp(68px,8.5vw,104px) clamp(20px,6vw,80px); position:relative; overflow:hidden; }
+ .hp-th { background:#08090d; border-top:1px solid rgba(198,161,91,.10); border-bottom:1px solid rgba(198,161,91,.10); padding:clamp(60px,7.5vw,90px) clamp(20px,6vw,80px); position:relative; overflow:hidden; }
  .hp-th-glow { position:absolute; top:-200px; right:-120px; width:620px; height:620px; border-radius:50%; background:radial-gradient(circle,rgba(198,161,91,.13),transparent 65%); pointer-events:none; }
  .hp-th-inner { position:relative; z-index:1; }
  .hp-th-head { max-width:780px; margin-bottom:clamp(36px,5vw,56px); }
@@ -166,12 +215,13 @@ const css = `
    border:1px solid rgba(232,200,118,.35); background:rgba(232,200,118,.10);
    display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--gold-lt);
  }
+ .hp-th-mark svg { width:22px; height:22px; }
  .hp-th-title { font-size:16.5px; font-weight:800; color:#fff; letter-spacing:-.012em; line-height:1.32; margin:0 0 11px; }
  .hp-th-text  { font-size:14px; font-weight:400; line-height:1.75; color:rgba(255,255,255,.80); margin:0; }
 
 
  /* ═══ 4 · PROCESS ═══ */
- .hp-pr { background:var(--paper); padding:clamp(68px,8.5vw,104px) clamp(20px,6vw,80px); }
+ .hp-pr { background:var(--paper); padding:clamp(60px,7.5vw,90px) clamp(20px,6vw,80px); }
  .hp-pr-head { margin-bottom:clamp(40px,5vw,60px); }
  .hp-pr-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(16px,2.2vw,24px); }
 
@@ -207,14 +257,14 @@ const css = `
 
 
  /* ═══ 5 · GEOGRAPHIC FOOTPRINT ═══ */
- .hp-geo { padding:clamp(68px,8.5vw,104px) clamp(20px,6vw,80px); position:relative; overflow:hidden;
+ .hp-geo { padding:clamp(60px,7.5vw,90px) clamp(20px,6vw,80px); position:relative; overflow:hidden;
    background:#08090d; }
  .hp-geo-inner { position:relative; z-index:1; }
  .hp-geo-head { margin-bottom:clamp(28px,3.4vw,42px); max-width:700px; }
 
 
  /* ═══ 6 · PHILOSOPHY + ACCORDION ═══ */
- .hp-phil { background:linear-gradient(180deg,var(--paper-2) 0%,var(--paper) 100%); padding:clamp(72px,9vw,108px) clamp(20px,6vw,80px); position:relative; overflow:hidden; }
+ .hp-phil { background:linear-gradient(180deg,var(--paper-2) 0%,var(--paper) 100%); padding:clamp(62px,7.8vw,94px) clamp(20px,6vw,80px); position:relative; overflow:hidden; }
  .hp-phil::before { content:'"'; position:absolute; top:-40px; left:clamp(20px,6vw,80px); font-size:clamp(180px,18vw,280px); font-weight:800; color:rgba(198,161,91,.12); line-height:1; pointer-events:none; user-select:none; }
  .hp-phil-inner { position:relative; z-index:1; display:grid; grid-template-columns:1fr 1fr; gap:clamp(40px,6vw,92px); align-items:start; }
  .hp-phil-quote { font-size:clamp(22px,3vw,40px); font-weight:300; font-style:italic; color:#0e1016; line-height:1.30; letter-spacing:-.015em; margin:0 0 28px; }
@@ -258,7 +308,7 @@ const css = `
 
 
  /* ═══ 8 · INSIGHTS ═══ */
- .hp-ins { background:var(--paper); padding:clamp(68px,8.5vw,104px) clamp(20px,6vw,80px); }
+ .hp-ins { background:var(--paper); padding:clamp(60px,7.5vw,90px) clamp(20px,6vw,80px); }
  .hp-ins-head { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:clamp(32px,4.5vw,52px); }
  .hp-ins-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
  .hp-ins-card {
@@ -285,7 +335,7 @@ const css = `
 
 
  /* ═══ CTA ═══ */
- .hp-cta { position:relative; overflow:hidden; text-align:center; padding:clamp(80px,11vw,120px) clamp(20px,6vw,80px);
+ .hp-cta { position:relative; overflow:hidden; text-align:center; padding:clamp(70px,9.5vw,104px) clamp(20px,6vw,80px);
    background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(198,161,91,.26),transparent 62%),linear-gradient(180deg,#0e1016,#070a0e); }
  .hp-cta-ring { position:absolute; top:50%; left:50%; border-radius:50%; border:1px solid rgba(232,200,118,.09); transform:translate(-50%,-50%); pointer-events:none; }
  .hp-cta-inner { position:relative; z-index:1; }
@@ -308,12 +358,24 @@ const css = `
  @media(max-width:960px){
    .hp-phil-inner { grid-template-columns:1fr; }
  }
+ @media(max-width:820px){
+   .hp-ns-grid { grid-template-columns:1fr; }
+ }
+ @media(max-width:560px){
+   /* headings keep the shared gutter; the cards bleed a little wider for room */
+   .hp-ns-grid { margin-inline:-14px; }
+   .hp-ns-card { padding:26px 22px; }
+   .hp-ns-top { margin-bottom:20px; }
+   .hp-ns-icon { width:46px; height:46px; border-radius:13px; }
+   .hp-ns-cta { letter-spacing:.06em; padding:14px 18px; justify-content:space-between; }
+ }
  @media(max-width:720px){
    .hp-sig-grid { grid-template-columns:1fr 1fr; }
    .hp-th-grid, .hp-ins-grid { grid-template-columns:1fr; }
    .hp-sig-head, .hp-ins-head { flex-direction:column; align-items:flex-start; }
  }
  @media(max-width:420px){
+   .hp-ns-cta { align-self:stretch; justify-content:center; padding:14px 10px; font-size:10.5px; letter-spacing:.04em; }
    .hp-sig-grid { grid-template-columns:1fr; }
    .hp-pr-top { flex-direction:column; align-items:flex-start; gap:12px; }
  }
@@ -324,6 +386,74 @@ const css = `
 
 
 /* ─────────── CONTENT ─────────── */
+
+
+const ICON_PROPS = {
+  viewBox: "0 0 24 24", fill: "none", stroke: "currentColor",
+  strokeWidth: 1.6, strokeLinecap: "round", strokeLinejoin: "round",
+  "aria-hidden": true,
+};
+
+const nextSteps = [
+  {
+    n: "01",
+    tag: "For Founders",
+    title: "Have a Business Idea?",
+    text: "Bring us a clear opportunity and a practical plan. IdeaTown Investments evaluates business ideas and growth proposals for potential direct capital backing.",
+    cta: "Share Your Business Idea",
+    href: "/contact#pitch-form",
+    lead: true,
+    icon: (
+      <svg {...ICON_PROPS}>
+        <path d="M9 18h6M10 21h4" />
+        <path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1.1 2V16h5v-.2c.1-.8.5-1.5 1.1-2A6 6 0 0 0 12 3Z" />
+      </svg>
+    ),
+  },
+  {
+    n: "02",
+    tag: "For Executives",
+    title: "Built Businesses for Others? Build Your Own.",
+    text: "If you are an experienced executive or operator ready to lead your own venture, bring your industry knowledge, business proposal and execution plan to IdeaTown.",
+    cta: "Explore Executive Backing",
+    href: "/executive",
+    icon: (
+      <svg {...ICON_PROPS}>
+        <rect x="3" y="7" width="18" height="13" rx="2" />
+        <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18" />
+      </svg>
+    ),
+  },
+  {
+    n: "03",
+    tag: "For Sellers",
+    title: "Considering a Business or Asset Sale?",
+    text: "IdeaTown evaluates operating businesses, properties, land and strategic assets across India as a direct capital buyer. We also welcome restructuring, lender-led and resolution opportunities.",
+    cta: "Share an Acquisition Opportunity",
+    href: "/business",
+    icon: (
+      <svg {...ICON_PROPS}>
+        <path d="M3 21h18M5 21V8l7-5 7 5v13" />
+        <path d="M9 21v-5h6v5M9 11h.01M15 11h.01" />
+      </svg>
+    ),
+  },
+  {
+    n: "04",
+    tag: "For Introducers",
+    title: "Representing a Relevant Opportunity?",
+    text: "Advisors, investment bankers, introducers, banks, ARCs and insolvency professionals can connect qualified business and acquisition opportunities directly with our investment team.",
+    cta: "Connect as an Introducer",
+    href: "/introducer",
+    icon: (
+      <svg {...ICON_PROPS}>
+        <circle cx="9" cy="8" r="3.2" />
+        <path d="M3 20a6 6 0 0 1 12 0" />
+        <path d="M16 4.6a3.2 3.2 0 0 1 0 6.8M18 14.4A6 6 0 0 1 21 20" />
+      </svg>
+    ),
+  },
+];
 
 
 const metrics = [
@@ -384,17 +514,33 @@ const missionVision = [
 
 const pillars = [
  {
-   mark: "◈",
+   mark: (
+     <svg {...ICON_PROPS}>
+       <circle cx="12" cy="12" r="9" />
+       <path d="m15.5 8.5-2.1 4.9-4.9 2.1 2.1-4.9 4.9-2.1Z" />
+     </svg>
+   ),
    title: "Strategic Operational Advisory",
    text: "Direct board-level guidance and active value-add capital. We partner with professionals and executive leaders to drive operational excellence, optimize market positioning, and scale sustainable enterprise value.",
  },
  {
-   mark: "◆",
+   mark: (
+     <svg {...ICON_PROPS}>
+       <path d="M3 21h18M4 10h16M12 3 4 7v3h16V7l-8-4Z" />
+       <path d="M6 10v8M10 10v8M14 10v8M18 10v8M5 18h14" />
+     </svg>
+   ),
    title: "Entrepreneurial Execution & Governance",
    text: "A 15+ year operating record applied directly. We partner with founders and executives to install institutional governance, active strategic support, and execution rigor.",
  },
  {
-   mark: "◇",
+   mark: (
+     <svg {...ICON_PROPS}>
+       <path d="M3 20h18" />
+       <path d="m4 16 5-5 4 3 7-7" />
+       <path d="M15 7h5v5" />
+     </svg>
+   ),
    title: "Sector-Agnostic Growth, No Exit Pressure",
    text: "Flexible capital built around long-term asset appreciation and market position not arbitrary fund cycles. No exit panic, no forced timelines.",
  },
@@ -506,6 +652,49 @@ export default function HomePage() {
 
      {/* ══ HERO ══ */}
      <Hero />
+
+
+     {/* ══ 0 · FIND YOUR NEXT STEP ══ */}
+     <section className="hp-ns" aria-labelledby="hp-ns-title">
+       <div className="hp-ns-glow" />
+       <div className="container hp-ns-inner">
+         <div className="hp-ns-head">
+           <h2 id="hp-ns-title" className="hp-sec-title hp-sec-title-light">
+             Find Your Next Step with{" "}
+             <span className="hp-shim">IdeaTown</span>
+           </h2>
+           <span className="hp-sec-rule hp-sec-rule-light" />
+           <p className="hp-ns-lede">
+             Direct capital for ambitious ideas, experienced leaders, business
+             acquisitions and opportunities introduced by trusted
+             professionals.
+           </p>
+         </div>
+
+
+         <div className="hp-ns-grid">
+           {nextSteps.map((s) => (
+             <article
+               className={`hp-ns-card${s.lead ? " hp-ns-card-lead" : ""}`}
+               key={s.n}
+             >
+               <div className="hp-ns-top">
+                 <div className="hp-ns-icon">{s.icon}</div>
+                 <div className="hp-ns-tag">
+                   <b>{s.n}</b>
+                   {s.tag}
+                 </div>
+               </div>
+               <h3 className="hp-ns-title">{s.title}</h3>
+               <p className="hp-ns-text">{s.text}</p>
+               <Link href={s.href} className="hp-ns-cta">
+                 {s.cta} <span aria-hidden="true">→</span>
+               </Link>
+             </article>
+           ))}
+         </div>
+       </div>
+     </section>
 
 
      {/* ══ 1 · KEY METRICS ══ */}
@@ -844,7 +1033,7 @@ export default function HomePage() {
              Submit Your Pitch ↗
            </Link>
            <Link href="/about" className="hp-btn-ghost">
-             About US
+             About Us
            </Link>
          </div>
        </div>

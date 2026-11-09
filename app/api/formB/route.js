@@ -10,7 +10,23 @@ export const runtime = "nodejs";
 const UPLOAD_DIR = path.resolve(process.env.UPLOAD_DIR || "./uploads");
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024;    // 25MB per file
-const MAX_TOTAL_SIZE = 100 * 1024 * 1024;  // 100MB per submission
+const MAX_TOTAL_SIZE = 100 * 1024 * 1024;  // 100MB per submission, across every upload field
+const MAX_SUPPORT_FILES = 10;              // "Additional Documents" on the form
+
+// File types each upload field accepts. Mirrors the `accept` lists on the
+// form (app/application/[token]/page.js), which only filter the picker.
+const ALLOWED_TYPES = {
+  pitch_deck: ["pdf", "ppt", "pptx", "doc", "docx"],
+  projections: ["pdf", "xls", "xlsx", "doc", "docx"],
+  business_plan: ["pdf", "doc", "docx"],
+  support: ["pdf", "ppt", "pptx", "doc", "docx", "xls", "xlsx"],
+};
+const FIELD_LABELS = {
+  pitch_deck: "Pitch Deck",
+  projections: "Financial Projections",
+  business_plan: "Business Plan",
+  support: "Additional Documents",
+};
 
 // Matches crypto.randomUUID() output, or the "app-<timestamp>-<random>"
 // fallback from makeToken(). Anything else is rejected outright.
@@ -45,6 +61,28 @@ function validateFileSizes(formData, fieldNames) {
       ok: false,
       status: 413,
       error: `Total upload size exceeds the ${MAX_TOTAL_SIZE / 1024 / 1024}MB limit for this submission.`,
+    };
+  }
+  return { ok: true };
+}
+
+function validateFileTypes(formData) {
+  const rejected = [];
+  for (const [field, exts] of Object.entries(ALLOWED_TYPES)) {
+    for (const file of formData.getAll(field)) {
+      if (file && typeof file === "object" && file.size > 0) {
+        const ext = file.name.includes(".") ? file.name.split(".").pop().toLowerCase() : "";
+        if (!exts.includes(ext)) {
+          rejected.push(`${file.name} (${FIELD_LABELS[field]} accepts ${exts.join(", ").toUpperCase()})`);
+        }
+      }
+    }
+  }
+  if (rejected.length) {
+    return {
+      ok: false,
+      status: 415,
+      error: `File type not accepted: ${rejected.join("; ")}.`,
     };
   }
   return { ok: true };
@@ -132,6 +170,16 @@ export async function POST(request) {
     ]);
     if (!fileCheck.ok) {
       return NextResponse.json({ error: fileCheck.error }, { status: fileCheck.status });
+    }
+    const typeCheck = validateFileTypes(formData);
+    if (!typeCheck.ok) {
+      return NextResponse.json({ error: typeCheck.error }, { status: typeCheck.status });
+    }
+    if (formData.getAll("support").length > MAX_SUPPORT_FILES) {
+      return NextResponse.json(
+        { error: `Please attach no more than ${MAX_SUPPORT_FILES} additional documents.` },
+        { status: 400 }
+      );
     }
 
     // Save files to disk

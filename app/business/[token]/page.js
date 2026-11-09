@@ -1,6 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import {
+  FormLinkChecking,
+  FormLinkUsed,
+  useFormLinkStatus,
+} from "@/components/FormLinkGate";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Footer from "@/components/Footer";
@@ -42,17 +47,18 @@ const SECTIONS = [
    Every file picked in an UploadField/AdditionalUploadsField is
    checked against MAX_FILE_BYTES (25MB) and, combined with every
    other file already attached anywhere in the form, MAX_TOTAL_BYTES
-   (100MB). A rejected file is cleared from its input immediately so
+   (95MB). A rejected file is cleared from its input immediately so
    it can never be attached, and a clear error box explains why
    ("File too large" / "Total size limit reached"). Sizes are tracked
    in the `fileSizes` map (keyed by field name, or `additional-<id>`
    for the dynamic "additional documents" list) so the running total
    is accurate even across several different upload fields.
-   The live server (Nginx) accepts up to 150MB per submission.
+   The combined cap stays under 100MB so the whole request (files plus
+   form text and multipart overhead) fits a 100MB server/proxy limit.
 ───────────────────────────────────────────────────────── */
 
 const MAX_FILE_BYTES = 25 * 1024 * 1024;   // 25MB per document
-const MAX_TOTAL_BYTES = 100 * 1024 * 1024; // 100MB combined across all attachments
+const MAX_TOTAL_BYTES = 95 * 1024 * 1024;  // 95MB combined across all attachments
 
 const REQUIRED_TEXT = "Please fill this in before continuing.";
 const REQUIRED_SELECT = "Please make a selection before continuing.";
@@ -726,7 +732,7 @@ function AmountInput({ required, placeholder, name, hasError, allowNegative = fa
 /* Additional documents: any number of extra upload slots, all named
    "additional_documents" so the POST route collects them as an array.
    Each slot is tracked under its own `additional-<id>` key so its size
-   counts toward the combined 100MB limit alongside every other upload. */
+   counts toward the combined 95MB limit alongside every other upload. */
 function AdditionalUploadsField({ checkFile, clearFileSize }) {
   const [items, setItems] = useState([{ id: 1, filename: "", problem: null }]);
 
@@ -906,7 +912,7 @@ function DistressIllustration() {
   );
 }
 
-export default function DistressLandingPage() {
+function DistressLandingPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [maxStepReached, setMaxStepReached] = useState(0);
   const [errors, setErrors] = useState({});
@@ -931,7 +937,7 @@ export default function DistressLandingPage() {
 
   const totalBytes = Object.values(fileSizes).reduce((sum, n) => sum + n, 0);
 
-  // Checks one candidate file against the 25MB-per-file and 100MB-combined
+  // Checks one candidate file against the 25MB-per-file and 95MB-combined
   // limits. On success it records the file's size under `key` so future
   // checks (from any other upload field) know about it. On failure it
   // returns { ok:false, title, message } for the error box.
@@ -957,7 +963,7 @@ export default function DistressLandingPage() {
       return {
         ok: false,
         title: "Total size limit reached",
-        message: `Adding “${file.name}” (${toMB(file.size)}MB) would bring your attachments to ${toMB(prospective)}MB. All attachments together must be 100MB or less — you have ${toMB(remaining)}MB left. Remove or compress a file and try again.`,
+        message: `Adding “${file.name}” (${toMB(file.size)}MB) would bring your attachments to ${toMB(prospective)}MB. All attachments together must be ${MAX_TOTAL_BYTES / 1024 / 1024}MB or less — you have ${toMB(remaining)}MB left. Remove or compress a file and try again.`,
       };
     }
     setFileSizes((s) => ({ ...s, [key]: file.size }));
@@ -1072,6 +1078,10 @@ export default function DistressLandingPage() {
   useEffect(() => {
     if (rotated.current) return; // guard against StrictMode's double-invoke
     rotated.current = true;
+    // A token the CRM minted and put in a Form B link identifies the lead it
+    // was sent to, so the application can attach itself. Minting a fresh one
+    // here would throw that away — keep whatever arrived in the URL.
+    if (urlToken && urlToken !== "demo") return;
     const fresh =
       typeof crypto !== "undefined" && crypto.randomUUID
         ? crypto.randomUUID()
@@ -1202,7 +1212,7 @@ export default function DistressLandingPage() {
       return;
     }
     if (totalAttachedBytes > MAX_TOTAL_BYTES) {
-      setErrorMsg(`Total size limit reached: your attachments add up to ${toMB(totalAttachedBytes)}MB. All attachments together must be 100MB or less — please remove or compress a file and try again.`);
+      setErrorMsg(`Total size limit reached: your attachments add up to ${toMB(totalAttachedBytes)}MB. All attachments together must be ${MAX_TOTAL_BYTES / 1024 / 1024}MB or less — please remove or compress a file and try again.`);
       return;
     }
 
@@ -1248,7 +1258,7 @@ export default function DistressLandingPage() {
   return (
     <>
       <div className="ds-page">
-        <style suppressHydrationWarning>{distressStyles}</style>
+        <style dangerouslySetInnerHTML={{ __html: distressStyles }} />
 
         {/* ── TOPBAR ── */}
         <div className="ds-topbar">
@@ -1826,6 +1836,8 @@ html, body { max-width: 100%; }
   -webkit-background-clip: text; background-clip: text; color: transparent;
   animation: ds-title-shine 6s ease-in-out infinite;
 }
+/* room for the italic overhang so gradient text isn't clipped */
+.ds-hero-title em { padding-right:.12em; margin-right:-.12em; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
 @keyframes ds-title-shine { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 .ds-hero-title em::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: 4px; height: 9px; z-index: -1;
@@ -2353,6 +2365,18 @@ html, body { max-width: 100%; }
   .ds-page .ds-amount-currency { width: 70px !important; min-width: 64px !important; font-size: 12px; }
 }
 
+/* ── touch & iOS polish ──
+   iOS Safari zooms into any focused control under 16px, so the
+   code/currency selects are pinned to 16px on phones, and choice
+   pills + the add-document button get a 44px tap target. */
+@media (max-width: 640px) {
+  .ds-page .ds-phone-code,
+  .ds-page .ds-amount-currency,
+  .ds-page .ds-field select { font-size: 16px !important; }
+  .ds-radio-pill { min-height: 44px; }
+  .ds-add-doc-btn { min-height: 44px; }
+}
+
 /* ── upload progress ── */
 .up-progress {
   margin: 0 0 18px; padding: 16px 18px 15px; border-radius: 12px;
@@ -2395,3 +2419,17 @@ html, body { max-width: 100%; }
   }
 }
 `;
+
+/**
+ * A used link must not open the form again. The token belongs to one lead and
+ * one application; a second submission on it is refused by the CRM anyway, so
+ * showing a blank form would only let someone fill it in for nothing.
+ */
+export default function DistressPageGate(props) {
+  const { token } = useParams();
+  const status = useFormLinkStatus(token);
+
+  if (status === "checking") return <FormLinkChecking />;
+  if (status === "used") return <FormLinkUsed />;
+  return <DistressLandingPage {...props} />;
+}

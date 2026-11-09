@@ -1,4 +1,5 @@
 import Pitch from "@/models/Pitch";
+import { mirrorToNewCrm } from "@/lib/mirrorToNewCrm";
 
 export async function sendPitchToExternalAPI(pitch) {
     try {
@@ -16,10 +17,27 @@ export async function sendPitchToExternalAPI(pitch) {
             updatedAt: pitch.updatedAt
         };
 
-        console.log("payload:", JSON.stringify(payload));
-        
+        // Same body to the rebuilt CRM. Never throws, so it cannot affect
+        // the forward below.
+        await mirrorToNewCrm("websiteLead", payload);
+
+        const configured = (process.env.EXTERNAL_API_URL_LEAD || "").trim();
+
+        // "disabled" turns the legacy forward off for this environment
+        // without unsetting the variable, which would fall through to the
+        // line below and post the lead to PRODUCTION. Unlike the other four
+        // forms, this one has no safe default, so the opt-out has to be
+        // explicit. Staging sets it; production sets a real URL.
+        if (configured.toLowerCase() === "disabled") {
+            console.warn("[CRM] EXTERNAL_API_URL_LEAD=disabled — skipping the legacy forward");
+            return;
+        }
+
+        const legacyUrl =
+            configured || process.env.EXTERNAL_API_URL + "/website_lead_ingest.php";
+
         const response = await fetch(
-            process.env.EXTERNAL_API_URL + "/website_lead_ingest.php",
+            legacyUrl,
             {
                 method: "POST",
                 headers: {

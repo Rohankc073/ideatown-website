@@ -51,3 +51,11 @@ coverage/
 
 # public
 /public/uploads
+# Founder-submitted files. These are real uploads, not source, and the repo
+# is public — they are served from disk and belong on the server only.
+/formB-uploads
+/distress-uploads
+/uploads-executive
+
+# Local tool state
+/.claude
